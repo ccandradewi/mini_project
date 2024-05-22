@@ -230,6 +230,8 @@ model Promo {
   event_id String
   event    Event  @relation(fields: [event_id], references: [id])
   promo    String
+  start_time  DateTime
+  end_time    DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
