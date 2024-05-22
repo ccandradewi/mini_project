@@ -47,6 +47,7 @@ model User {
   Point           Point[]
   Order           Order[]
   Review          Review[]
+  Promo           Promo[]
 
   @@index([username, email])
   @@map("users")
@@ -136,6 +137,7 @@ model Event {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   Ticket      Ticket[]
+  Promo       Promo[]
 
   @@index([title])
   @@map("events")
@@ -219,4 +221,18 @@ model Review {
   updatedAt DateTime @updatedAt
 
   @@map("reviews")
+}
+
+model Promo {
+  id       String @id @default(cuid())
+  user     User   @relation(fields: [user_id], references: [id])
+  user_id  String
+  event_id String
+  event    Event  @relation(fields: [event_id], references: [id])
+  promo    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("promos")
 }

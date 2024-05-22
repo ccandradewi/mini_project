@@ -11,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.12.12",
+    "@types/nodemailer": "^6.4.15",
     "typescript": "^5.4.5"
   },
   "dependencies": {
@@ -24,6 +25,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.14.0"
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "path": "^0.12.7",
+    "prisma": "^5.14.0",
+    "referral-codes": "^3.0.0",
+    "sharp": "^0.33.4"
   }
 }
