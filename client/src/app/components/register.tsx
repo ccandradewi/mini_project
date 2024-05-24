@@ -103,7 +103,7 @@ const Register = () => {
                   </div>
                   <div className="col-12">
                     <label htmlFor="email" className="form-label">
-                      ${formik.values.email}{" "}
+                      ${formik.values.email}
                       <span className="text-danger">*</span>
                     </label>
                     <input

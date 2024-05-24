@@ -15,10 +15,6 @@ class UserService {
       last_name,
       phone_number,
       address,
-      gender,
-      dob,
-      avatar,
-      referral_code,
       reference_code,
     } = req.body;
     const existingUser = await prisma.user.findMany({
@@ -28,20 +24,15 @@ class UserService {
     });
     if (existingUser.length) throw new Error("username/email already used");
     const hashPass = await hashPassword(password);
-    const [referral_code] = generateReferral({ length: 8 });
     const data: Prisma.UserCreateInput = {
       email,
       password: hashPass,
       username,
       role,
-      gender,
       first_name,
       last_name,
       phone_number,
       address,
-      dob,
-      avatar,
-      referral_code: generateRef,
       reference_code,
     };
     await prisma.user.create({
