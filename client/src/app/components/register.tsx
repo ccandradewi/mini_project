@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import YupPassword from "yup-password";
 import * as Yup from "yup";
@@ -52,7 +53,7 @@ const Register = () => {
           <div className="col-12 col-md-6 bsb-tpl-bg-platinum">
             <div className="d-flex flex-column justify-content-between h-100 p-3 p-md-4 p-xl-5">
               <h3 className="m-0">Welcome!</h3>
-              <img />
+              {/* <img /> */}
               <p className="mb-0">
                 Not a member yet?{" "}
                 <a href="#!" className="link-secondary text-decoration-none">
