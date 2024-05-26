@@ -16,6 +16,7 @@ const Register = () => {
     last_name: "",
     phone_number: "",
   };
+
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object().shape({
@@ -33,6 +34,8 @@ const Register = () => {
     }),
     onSubmit: async (values) => {
       try {
+        console.log("masuk");
+        
         const { data } = await axiosInstance().post("/users/v1", values);
         alert(data.message); //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
