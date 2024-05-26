@@ -2,10 +2,9 @@ import {
   Event,
   Gender,
   Order,
-  Point,
   Review,
   Role,
-  VoucherReferral,
+  VoucherPoint,
 } from "@prisma/client";
 
 export type TUser = {
@@ -15,19 +14,18 @@ export type TUser = {
   role?: Role;
   username?: String;
   first_name?: String;
-  Last_name?: String;
+  last_name?: String;
   phone_number?: String;
   address?: String;
   gender?: Gender;
   dob?: Date;
   avatar?: String;
   referral_code?: String;
-  reference_code: String;
+  reference_code?: String;
   createdAt?: Date;
   updatedAt?: Date;
-  VoucherReferral: VoucherReferral[];
+  VoucherPoint: VoucherPoint[];
   Event: Event[];
-  Point?: Point[];
   Order: Order[];
   Review: Review[];
-};
+} | null;

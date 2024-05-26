@@ -1,4 +1,4 @@
-import { Category, EventLocation, Ticket, User } from "@prisma/client";
+import { Category, EventLocation, Ticket, User, Promo } from "@prisma/client";
 
 export type TEvent = {
   id: String;
@@ -15,4 +15,5 @@ export type TEvent = {
   createdAt?: Date;
   updatedAt?: Date;
   ticket: Ticket[];
-};
+  promo: Promo;
+} | null;
