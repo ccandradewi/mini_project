@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import YupPassword from "yup-password";
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -14,7 +14,6 @@ const Register = () => {
     first_name: "",
     last_name: "",
     phone_number: "",
-    address: "",
   };
   const formik = useFormik({
     initialValues,
@@ -23,24 +22,28 @@ const Register = () => {
       password: Yup.string().required().min(6).minNumbers(1).minUppercase(1),
       username: Yup.string().required().min(5),
       role: Yup.string().oneOf(["seller", "buyer"]).required(),
-      first_name: Yup.string().required(),
-      last_name: Yup.string().required(),
+      first_name: Yup.string().required().min(3),
+      last_name: Yup.string().required().min(3),
       phone_number: Yup.string()
         .matches(/^[0-9]+$/)
         .min(10)
         .required(),
-      address: Yup.string().required(),
       reference_code: Yup.string(),
     }),
     onSubmit: async (values) => {
       try {
-        const { data } = await axiosInstance().post("/users/v2", values);
+        const { data } = await axiosInstance().post("/users/v1", values);
         alert(data.message); //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
-        console.log(error);
+        alert("username/email already registered");
       }
     },
   });
+  useEffect(() => {
+    if (formik.values.role === "seller") {
+      formik.setFieldValue("reference_code", "");
+    }
+  }, [formik.values.role]);
   return (
     <section className="p-3 p-md-4 p-xl-5">
       <div className="container">
@@ -69,34 +72,30 @@ const Register = () => {
                   </div>
                 </div>
               </div>
-              <form action="#!">
+              <form onSubmit={formik.handleSubmit}>
                 <div className="row gy-3 gy-md-4 overflow-hidden">
                   <div className="col-12">
-                    <label htmlFor="firstName" className="form-label">
+                    <label htmlFor="first_name" className="form-label">
                       First Name <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      name="firstName"
-                      id="firstName"
-                      value={formik.values.first_name}
-                      onChange={formik.handleChange}
+                      id="first_name"
+                      {...formik.getFieldProps("first_name")}
                       placeholder="First Name"
                       required
                     />
                   </div>
                   <div className="col-12">
-                    <label htmlFor="lastName" className="form-label">
+                    <label htmlFor="last_name" className="form-label">
                       Last Name <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      name="lastName"
-                      id="lastName"
-                      value={formik.values.last_name}
-                      onChange={formik.handleChange}
+                      id="last_name"
+                      {...formik.getFieldProps("last_name")}
                       placeholder="Last Name"
                       required
                     />
@@ -109,25 +108,21 @@ const Register = () => {
                     <input
                       type="email"
                       className="form-control"
-                      name="email"
                       id="email"
-                      value={formik.values.email}
-                      onChange={formik.handleChange}
+                      {...formik.getFieldProps("email")}
                       placeholder="name@example.com"
                       required
                     />
                   </div>
                   <div className="col-12">
-                    <label htmlFor="lastName" className="form-label">
+                    <label htmlFor="username" className="form-label">
                       Username <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      name="username"
                       id="username"
-                      value={formik.values.username}
-                      onChange={formik.handleChange}
+                      {...formik.getFieldProps("username")}
                       placeholder="Username"
                       required
                     />
@@ -139,10 +134,8 @@ const Register = () => {
                     <input
                       type="password"
                       className="form-control"
-                      name="password"
                       id="password"
-                      value={formik.values.password}
-                      onChange={formik.handleChange}
+                      {...formik.getFieldProps("password")}
                       required
                     />
                   </div>
@@ -152,16 +145,13 @@ const Register = () => {
                       <input
                         className="form-check-input"
                         type="radio"
-                        name="inlineRadioOptions"
-                        id="femaleGender"
-                        value={formik.values.role}
+                        name="role"
+                        id="role_buyer"
+                        value="buyer"
+                        checked={formik.values.role === "buyer"}
                         onChange={formik.handleChange}
-                        defaultChecked
                       />
-                      <label
-                        className="form-check-label"
-                        htmlFor="femaleGender"
-                      >
+                      <label className="form-check-label" htmlFor="role_buyer">
                         Buyer
                       </label>
                     </div>
@@ -169,81 +159,52 @@ const Register = () => {
                       <input
                         className="form-check-input"
                         type="radio"
-                        name="inlineRadioOptions"
-                        id="maleGender"
-                        value={formik.values.role}
+                        name="role"
+                        id="role_seller"
+                        value="seller"
+                        checked={formik.values.role === "seller"}
                         onChange={formik.handleChange}
                       />
-                      <label className="form-check-label" htmlFor="maleGender">
+                      <label className="form-check-label" htmlFor="role_seller">
                         Seller
                       </label>
                     </div>
                   </div>
                   <div className="col-12">
-                    <label htmlFor="lastName" className="form-label">
+                    <label htmlFor="phone_number" className="form-label">
                       Phone Number <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      name="phoneNumber"
-                      id="phoneNumber"
-                      value={formik.values.phone_number}
-                      onChange={formik.handleChange}
+                      id="phone_number"
+                      {...formik.getFieldProps("phone_number")}
                       placeholder="Phone Number"
                       required
                     />
                   </div>
                   <div className="col-12">
-                    <label htmlFor="lastName" className="form-label">
-                      Address <span className="text-danger">*</span>
+                    <label htmlFor="reference_code" className="form-label">
+                      Have a Referral Code?{" "}
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      name="address"
-                      id="address"
-                      value={formik.values.address}
-                      onChange={formik.handleChange}
-                      placeholder="Address"
-                      required
+                      id="reference_code"
+                      {...formik.getFieldProps("reference_code")}
+                      placeholder="for example: hab239"
+                      disabled={formik.values.role === "seller"}
                     />
                   </div>
                   <div className="col-12">
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="iAgree"
-                        id="iAgree"
-                        required
-                      />
-                      <label
-                        className="form-check-label text-secondary"
-                        htmlFor="iAgree"
+                    <div className="d-grid">
+                      <button
+                        className="btn bsb-btn-xl btn-primary"
+                        type="submit"
                       >
-                        I agree to the{" "}
-                        <a
-                          href="#!"
-                          className="link-primary text-decoration-none"
-                        >
-                          terms and conditions
-                        </a>
-                      </label>
+                        Sign up
+                      </button>
                     </div>
-                  </div>
-                </div>
-              </form>
-              <form onSubmit={formik.handleSubmit}>
-                <div className="col-12">
-                  <div className="d-grid">
-                    <button
-                      className="btn bsb-btn-xl btn-primary"
-                      type="submit"
-                      defaultValue={formik.initialStatus}
-                    >
-                      Sign up
-                    </button>
                   </div>
                 </div>
               </form>

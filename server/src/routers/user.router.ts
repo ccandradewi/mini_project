@@ -7,7 +7,7 @@ class UserRouter {
     this.initializedRoutes();
   }
   initializedRoutes() {
-    this.router.post("/v2", userController.register);
+    this.router.post("/v1", userController.register);
   }
 
   getRouter() {

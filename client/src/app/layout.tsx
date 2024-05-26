@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/navbar";
-import Register from "./components/register";
 import "bootstrap/dist/css/bootstrap.css";
+import Navbar from "./components/navbar";
+import Register from "./users/_component/register";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        <Register />
+        {/* <Register /> */}
         <main>{children}</main>
       </body>
     </html>

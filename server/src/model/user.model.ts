@@ -28,4 +28,4 @@ export type TUser = {
   Event: Event[];
   Order: Order[];
   Review: Review[];
-} | null;
+};

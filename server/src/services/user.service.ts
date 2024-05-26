@@ -32,7 +32,8 @@ class UserService {
     //   const existingCode = await prisma.user.findFirst({
     //     where: {
     //       referral_code: req.body.reference_code
-    //     }
+    //     },
+
     //   })
     // }
 
