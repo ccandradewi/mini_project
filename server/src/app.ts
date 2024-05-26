@@ -14,11 +14,11 @@ export class App {
     this.app = express();
     this.configure();
     this.routes();
-    this.errorHandler;
+    this.errorHandler();
   }
 
   private routes() {
-    this.app.use("/*", (req: Request, res: Response) => {
+    this.app.get("/", (req: Request, res: Response) => {
       res.send("Welcome to Ticketing App API!");
     });
     this.app.use("/users", userRouter.getRouter());

@@ -1,9 +1,8 @@
-import referralCodes from "referral-codes";
-interface ReferralCodeOptions {
-  length?: number;
+import voucherCodes from "voucher-code-generator";
+class ReferralCode {
+  static generateCode(length = 6) {
+    return voucherCodes.generate({ length });
+  }
 }
-export const generateReferral = (
-  options: ReferralCodeOptions = { length: 8 }
-) => {
-  return referralCodes.generate(options);
-};
+
+export default ReferralCode;
