@@ -1,5 +1,13 @@
-import Image from "next/image";
+// src/pages/_app.tsx
+"use client";
+import React from 'react';
+import { AppProps } from 'next/app';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function Home() {
-  return <main> Minpro</main>;
-}
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  return (
+    <h1>Ini homepage</h1>
+  );
+};
+
+export default MyApp;

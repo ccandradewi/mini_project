@@ -8,6 +8,26 @@ import {
 } from "@prisma/client";
 
 export type TUser = {
+<<<<<<< HEAD
+  id: string;
+  email: string;
+  password?: string;
+  role: Role;
+  username: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  address: string | null;
+  gender: Gender | null;
+  dob: Date | null;
+  avatar?: string | null;
+  referral_code?: string | null;
+  reference_code?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+
+} | null;
+=======
   id?: String;
   email?: String;
   password?: String;
@@ -29,3 +49,4 @@ export type TUser = {
   Order: Order[];
   Review: Review[];
 };
+>>>>>>> main
