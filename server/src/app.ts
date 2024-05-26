@@ -6,6 +6,7 @@ import express, {
     type Request,
     type Response,
   } from "express";
+import userRouter from "./routers/user.router";
 
 export  class App {
     private app: Application;
@@ -17,10 +18,10 @@ export  class App {
     }
 
     private routes() {
-        this.app.use("/*", (req: Request, res:Response) => {
-            res.send("Welcome to Ticketing App API!");
-        });
-        // this.app.use("/users", userRouter.getRouter());
+        this.app.use("/users", userRouter.getRouter());
+        // this.app.use("/", (req: Request, res:Response) => {
+        //     res.send("Welcome to Ticketing App API!");
+        // });
         // this.app.use("/event", eventRouter.getRouter())
     }
 

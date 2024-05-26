@@ -24,57 +24,45 @@ enum Role {
 }
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
+  id             String    @id @default(cuid())
+  email          String    @unique
   password       String
   role           Role
-  username       String   @unique
+  username       String    @unique
   first_name     String
   last_name      String
-  phone_number   String
-  address        String
-  gender         Gender
-  dob            DateTime
-  avatar         String
-  referral_code  String
-  reference_code String
+  phone_number   String    @db.VarChar(15)
+  address        String?
+  gender         Gender?
+  dob            DateTime?
+  avatar         String?
+  referral_code  String?
+  reference_code String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  VoucherReferral VoucherReferral[]
-  Event           Event[]
-  Point           Point[]
-  Order           Order[]
-  Review          Review[]
-  Promo           Promo[]
+  VoucherPoint VoucherPoint[]
+  Event        Event[]
+  Order        Order[]
+  Review       Review[]
 
   @@index([username, email])
   @@map("users")
 }
 
-model VoucherReferral {
-  id      String @id @default(cuid())
-  user    User   @relation(fields: [user_id], references: [id])
-  user_id String
-  voucher String
+model VoucherPoint {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [user_id], references: [id])
+  user_id      String
+  point        Float    @db.Double
+  expired_date DateTime
+  voucher      Float    @db.Double
+  isValid      Boolean  @default(true)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("vouchers")
-}
-
-model Point {
-  id      String  @id @default(cuid())
-  user    User    @relation(fields: [user_id], references: [id])
-  user_id String
-  point   Decimal
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("points")
 }
 
 enum LocationName {
@@ -119,6 +107,12 @@ model EventLocation {
   @@map("locations")
 }
 
+enum Promo {
+  TEN_PERCENT         @map("10%")
+  TWENTY_FIVE_PERCENT @map("25%")
+  FIFTY_PERCENT       @map("50%")
+}
+
 model Event {
   id          String        @id @default(cuid())
   user        User          @relation(fields: [user_id], references: [id])
@@ -137,7 +131,7 @@ model Event {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   Ticket      Ticket[]
-  Promo       Promo[]
+  Promo       Promo
 
   @@index([title])
   @@map("events")
@@ -221,20 +215,4 @@ model Review {
   updatedAt DateTime @updatedAt
 
   @@map("reviews")
-}
-
-model Promo {
-  id       String @id @default(cuid())
-  user     User   @relation(fields: [user_id], references: [id])
-  user_id  String
-  event_id String
-  event    Event  @relation(fields: [event_id], references: [id])
-  promo    String
-  start_time  DateTime
-  end_time    DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("promos")
 }
