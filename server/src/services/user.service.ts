@@ -5,7 +5,6 @@ import type { TUser } from "../model/user.model";
 import { Request } from "express";
 import { createToken } from "../libs/jwt";
 import ReferralCode from "../libs/referral";
-import { log } from "console";
 
 class UserService {
   async userLogin(req: Request) {

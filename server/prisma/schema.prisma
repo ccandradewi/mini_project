@@ -38,6 +38,7 @@ model User {
   avatar         String?
   referral_code  String?
   reference_code String?
+  isVerified     Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,7 +65,6 @@ model VoucherPoint {
 
   @@map("vouchers")
 }
-
 
 enum LocationName {
   JABODETABEK
@@ -132,7 +132,7 @@ model Event {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   Ticket      Ticket[]
-  Promo       Promo
+  Promo       Promo?
 
   @@index([title])
   @@map("events")

@@ -10,11 +10,12 @@ const Register = () => {
   const initialValues = {
     email: "",
     password: "",
-    role: "",
+    role: "buyer",
     username: "",
     first_name: "",
     last_name: "",
     phone_number: "",
+    reference_code:""
   };
 
   const formik = useFormik({
@@ -44,10 +45,11 @@ const Register = () => {
     },
   });
   useEffect(() => {
-    if (formik.values.role === "seller") {
+    console.log(formik.values);
+        if (formik.values.role === "seller") {
       formik.setFieldValue("reference_code", "");
     }
-  }, [formik.values.role]);
+  }, [formik.values]);
   return (
     <section className="p-3 p-md-4 p-xl-5">
       <div className="container">
@@ -142,6 +144,8 @@ const Register = () => {
                       {...formik.getFieldProps("password")}
                       required
                     />
+                    {/* {formik.errors.password} */}
+
                   </div>
                   <div className="col-md-6 mb-4">
                     <h6 className="mb-2 pb-1">Role: </h6>
@@ -150,10 +154,10 @@ const Register = () => {
                         className="form-check-input"
                         type="radio"
                         name="role"
-                        id="role_buyer"
                         value="buyer"
                         checked={formik.values.role === "buyer"}
-                        onChange={formik.handleChange}
+                        // defaultChecked
+                        onChange={(e) => formik.setFieldValue("role",e.target.value)}
                       />
                       <label className="form-check-label" htmlFor="role_buyer">
                         Buyer
@@ -164,10 +168,9 @@ const Register = () => {
                         className="form-check-input"
                         type="radio"
                         name="role"
-                        id="role_seller"
                         value="seller"
                         checked={formik.values.role === "seller"}
-                        onChange={formik.handleChange}
+                        onChange={(e) => formik.setFieldValue("role",e.target.value)}
                       />
                       <label className="form-check-label" htmlFor="role_seller">
                         Seller
@@ -197,7 +200,7 @@ const Register = () => {
                       id="reference_code"
                       {...formik.getFieldProps("reference_code")}
                       placeholder="for example: hab239"
-                      disabled={formik.values.role === "seller"}
+                      disabled={formik.values.role == "seller"}
                     />
                   </div>
                   <div className="col-12">
