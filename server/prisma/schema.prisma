@@ -65,6 +65,7 @@ model VoucherPoint {
   @@map("vouchers")
 }
 
+
 enum LocationName {
   JABODETABEK
   JAWA
