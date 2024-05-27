@@ -4,7 +4,7 @@ import YupPassword from "yup-password";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { axiosInstance } from "@/lib/axios.config";
-
+import Link from "next/link";
 const Register = () => {
   YupPassword(Yup);
   const initialValues = {
@@ -15,7 +15,7 @@ const Register = () => {
     first_name: "",
     last_name: "",
     phone_number: "",
-    reference_code:""
+    reference_code: "",
   };
 
   const formik = useFormik({
@@ -36,7 +36,7 @@ const Register = () => {
     onSubmit: async (values) => {
       try {
         console.log("masuk");
-        
+
         const { data } = await axiosInstance().post("/users/v1", values);
         alert(data.message); //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
@@ -46,7 +46,7 @@ const Register = () => {
   });
   useEffect(() => {
     console.log(formik.values);
-        if (formik.values.role === "seller") {
+    if (formik.values.role === "seller") {
       formik.setFieldValue("reference_code", "");
     }
   }, [formik.values]);
@@ -91,7 +91,10 @@ const Register = () => {
                       {...formik.getFieldProps("first_name")}
                       placeholder="First Name"
                       required
-                    />
+                    />{" "}
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.first_name}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="last_name" className="form-label">
@@ -105,7 +108,11 @@ const Register = () => {
                       placeholder="Last Name"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.last_name}
+                    </div>
                   </div>
+
                   <div className="col-12">
                     <label htmlFor="email" className="form-label">
                       Email
@@ -119,6 +126,9 @@ const Register = () => {
                       placeholder="name@example.com"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.email}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="username" className="form-label">
@@ -132,6 +142,9 @@ const Register = () => {
                       placeholder="Username"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.username}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="password" className="form-label">
@@ -144,8 +157,9 @@ const Register = () => {
                       {...formik.getFieldProps("password")}
                       required
                     />
-                    {/* {formik.errors.password} */}
-
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.password}
+                    </div>
                   </div>
                   <div className="col-md-6 mb-4">
                     <h6 className="mb-2 pb-1">Role: </h6>
@@ -156,8 +170,9 @@ const Register = () => {
                         name="role"
                         value="buyer"
                         checked={formik.values.role === "buyer"}
-                        // defaultChecked
-                        onChange={(e) => formik.setFieldValue("role",e.target.value)}
+                        onChange={(e) =>
+                          formik.setFieldValue("role", e.target.value)
+                        }
                       />
                       <label className="form-check-label" htmlFor="role_buyer">
                         Buyer
@@ -170,7 +185,9 @@ const Register = () => {
                         name="role"
                         value="seller"
                         checked={formik.values.role === "seller"}
-                        onChange={(e) => formik.setFieldValue("role",e.target.value)}
+                        onChange={(e) =>
+                          formik.setFieldValue("role", e.target.value)
+                        }
                       />
                       <label className="form-check-label" htmlFor="role_seller">
                         Seller
@@ -220,9 +237,13 @@ const Register = () => {
                   <hr className="mt-5 mb-4 border-secondary-subtle" />
                   <p className="m-0 text-secondary text-end">
                     Already have an account?{" "}
-                    <a href="#!" className="link-primary text-decoration-none">
+                    <Link
+                      href="/users/v2"
+                      passHref
+                      className="link-primary text-decoration-none"
+                    >
                       Sign in
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </div>
