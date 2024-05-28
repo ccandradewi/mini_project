@@ -1,5 +1,6 @@
-import { Response, Request, NextFunction, Router } from "express";
+import { Response, type Request, type NextFunction, Router } from "express";
 import userController from "../controllers/user.controller";
+import { verifyUser } from "../middlewares/auth.middleware";
 
 class UserRouter {
     private router: Router;
@@ -12,6 +13,9 @@ class UserRouter {
     initializedRoutes() {
         this.router.post("/v1", userController.register)
         this.router.post("/v2", userController.login);
+        this.router.post("/logout", userController.logout);
+        this.router.get("/:id", userController.getUserById);
+        this.router.get("/current",userController.getCurrentUser)
     }
 
     getRouter() {

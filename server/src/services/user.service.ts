@@ -1,10 +1,12 @@
 import type { Prisma } from "@prisma/client";
+import type { TUser } from "../model/user.model";
 import { prisma } from "../libs/prisma";
 import { comparePassword, hashPassword } from "../libs/bcrypt";
-import type { TUser } from "../model/user.model";
 import { Request } from "express";
 import { createToken } from "../libs/jwt";
 import ReferralCode from "../libs/referral";
+import { verify } from "jsonwebtoken";
+import { SECRET_KEY } from "../config/config";
 
 class UserService {
   async userLogin(req: Request) {
@@ -161,6 +163,51 @@ class UserService {
       console.log("user added, no ref code");
     }
   }
+
+  async userLogout(req:Request) {
+  }
+
+  async getUserById(req:Request) {
+    const { id } = req.params;
+    const data = await prisma.user.findFirst({
+      where:
+      { 
+        id
+      },
+    }) as TUser;
+    delete data?.password;
+    return data;
+  }
+
+  async getCurrentUser(req:Request): Promise<TUser | null> {
+    try {
+      const authToken = req.headers.authorization?.replace("Bearer, ", "");
+      if (!authToken) {
+        throw new Error("Auth token not provided");
+      }
+
+      const verifiedUser = verify(authToken, SECRET_KEY) as TUser;
+      return verifiedUser;
+      } catch (error) {
+      console.log("Error getting current user", error);
+      return null;
+    }
+  }
+  // async getCurrentUser(token: string) {
+  //   if (!token) throw new Error("No token provided");
+
+  //   const decoded = verify(token, SECRET_KEY) as { id: string};
+
+  //   const user = await prisma.user.findUnique({
+  //     where: { 
+  //       id: decoded.id 
+  //     }
+  //   })
+
+  //   if (!user) throw new Error("User not found");
+
+  //   return user;
+  // }
 }
 
 export default new UserService();

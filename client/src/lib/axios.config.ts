@@ -8,7 +8,7 @@ export function axiosInstance() {
   return axios.create({
     baseURL: "http://localhost:8000",
     headers: {
-      Authorization: "Bearer" + token,
+      Authorization: `Bearer ${token}`,
     },
     withCredentials: true,
   });
