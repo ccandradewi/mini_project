@@ -8,6 +8,7 @@ import ReferralCode from "../libs/referral";
 import { transporter } from "../libs/nodemailer";
 import { SECRET_KEY } from "../config/config";
 import { verify } from "jsonwebtoken";
+
 class UserService {
   async userLogin(req: Request) {
     const { email, password } = req.body;
@@ -170,26 +171,39 @@ class UserService {
       });
       console.log(newUser, "user no ref");
     }
-    const verif_token = createToken({ id: newUser.id }, "15m");
+    const verifyToken = createToken({ id: newUser.id }, "15m");
 
     transporter.sendMail({
       to: data.email,
       subject: "Welcome To Tickzy, Please Verify Your Email Address",
-      html: `<h1 classname= text-blue-700>Thank you for registering with Tickzy! We're excited to have you on board.</h1> <a href=http://localhost:3000/users/v2>verify your email here</a>`,
+      html: `<h1 classname= text-blue-700>Thank you for registering with Tickzy! We're excited to have you on board.</h1> <a href="http://localhost:3000/users/verification/${verifyToken}">verify your email here</a>`,
     });
   }
+
   async sendVerification(req: Request) {
+    try {
     const { token } = req.params;
     const user = verify(token, SECRET_KEY) as TUser;
+
+    if (!user || !user.id) {
+      throw new Error("Invalid token/user");
+    }
+    
     await prisma.user.update({
-      data: {
-        isVerified: true,
-      },
       where: {
         id: user?.id,
       },
+      data: {
+        isVerified: true,
+      },
     });
+
+    return { success: true};
+  } catch (error) {
+    console.log("Error sending verification");
+    
   }
 }
+};
 
 export default new UserService();

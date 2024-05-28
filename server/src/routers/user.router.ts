@@ -12,7 +12,7 @@ class UserRouter {
   initializedRoutes() {
     this.router.post("/v1", userController.register);
     this.router.post("/v2", userController.login);
-    this.router.get("/v3:token", userController.sendVerif);
+    this.router.get("/verification/:token", userController.sendVerif);
   }
 
   getRouter() {

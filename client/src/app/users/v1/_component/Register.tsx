@@ -6,7 +6,11 @@ import { useFormik } from "formik";
 import { axiosInstance } from "@/lib/axios.config";
 import Link from "next/link";
 import { TUser } from "@/models/user.model";
+import { useRouter } from "next/navigation";
+
 const Register = () => {
+  const router = useRouter();
+
   YupPassword(Yup);
 
   const initialValues = {
@@ -37,8 +41,9 @@ const Register = () => {
     onSubmit: async (values: TUser) => {
       try {
         console.log("masuk");
-        const { data } = await axiosInstance().post("/users/v1", values);
-        alert(data.message);
+        await axiosInstance().post("/users/v1", values);
+        router.push("/users/v3")
+        // alert(data.message);
         //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
         console.log(error);
