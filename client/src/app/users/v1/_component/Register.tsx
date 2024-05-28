@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { axiosInstance } from "@/lib/axios.config";
 import Link from "next/link";
+
 const Register = () => {
   YupPassword(Yup);
   const initialValues = {
@@ -36,10 +37,11 @@ const Register = () => {
     onSubmit: async (values) => {
       try {
         console.log("masuk");
-
         const { data } = await axiosInstance().post("/users/v1", values);
-        alert(data.message); //alert bisa custom pake shadcn atau sweetalert
+        alert(data.message);
+        //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
+        console.log(error);
         alert("username/email already registered");
       }
     },
