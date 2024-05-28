@@ -38,7 +38,7 @@ model User {
   avatar         String?
   referral_code  String?
   reference_code String?
-  isVerified     Boolean @default(false)
+  isVerified     Boolean?  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -16,6 +16,7 @@ export type TUser = {
   first_name: string;
   last_name: string;
   phone_number: string;
+  isVerified?: boolean | null;
   address: string | null;
   gender: Gender | null;
   dob: Date | null;
@@ -24,5 +25,4 @@ export type TUser = {
   reference_code?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
-
 } | null;

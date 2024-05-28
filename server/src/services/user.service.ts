@@ -5,7 +5,9 @@ import type { TUser } from "../model/user.model";
 import { Request } from "express";
 import { createToken } from "../libs/jwt";
 import ReferralCode from "../libs/referral";
-
+import { transporter } from "../libs/nodemailer";
+import { SECRET_KEY } from "../config/config";
+import { verify } from "jsonwebtoken";
 class UserService {
   async userLogin(req: Request) {
     const { email, password } = req.body;
@@ -50,6 +52,7 @@ class UserService {
   }
 
   async userRegister(req: Request) {
+    console.log("masuk di function ini");
     const {
       email,
       password,
@@ -84,6 +87,8 @@ class UserService {
       referral_code: referralCode[0],
     };
 
+    let newUser;
+
     // VOUCHER POINT SECTION
 
     // check if new user inputs ref code, check if ref code exists
@@ -96,7 +101,7 @@ class UserService {
       console.log("referrer found", referrer);
 
       // add new user using referrer's ref code
-      const newUser = await prisma.user.create({
+      newUser = await prisma.user.create({
         data,
       });
       console.log("new user created with reference", newUser);
@@ -155,11 +160,30 @@ class UserService {
       console.log("point added to new user", newVoucherPoint);
     } else {
       // if new user doesnt use any ref code
-      await prisma.user.create({
+      newUser = await prisma.user.create({
         data,
       });
-      console.log("user added, no ref code");
+      console.log(newUser, "user no ref");
     }
+    const verif_token = createToken({ id: newUser.id }, "15m");
+
+    transporter.sendMail({
+      to: data.email,
+      subject: "Welcome To Tickzy, Please Verify Your Email Address",
+      html: `<h1 classname= text-blue-700>Thank you for registering with Tickzy! We're excited to have you on board.</h1> <a href=http://localhost:3000/users/v2>verify your email here</a>`,
+    });
+  }
+  async sendVerification(req: Request) {
+    const { token } = req.params;
+    const user = verify(token, SECRET_KEY) as TUser;
+    await prisma.user.update({
+      data: {
+        isVerified: true,
+      },
+      where: {
+        id: user?.id,
+      },
+    });
   }
 }
 
