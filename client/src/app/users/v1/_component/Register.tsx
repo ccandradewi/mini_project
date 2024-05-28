@@ -5,9 +5,10 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { axiosInstance } from "@/lib/axios.config";
 import Link from "next/link";
-
+import { TUser } from "@/models/user.model";
 const Register = () => {
   YupPassword(Yup);
+
   const initialValues = {
     email: "",
     password: "",
@@ -18,7 +19,6 @@ const Register = () => {
     phone_number: "",
     reference_code: "",
   };
-
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object().shape({
@@ -34,7 +34,7 @@ const Register = () => {
         .required(),
       reference_code: Yup.string(),
     }),
-    onSubmit: async (values) => {
+    onSubmit: async (values: TUser) => {
       try {
         console.log("masuk");
         const { data } = await axiosInstance().post("/users/v1", values);

@@ -73,8 +73,11 @@ class UserService {
 
     const hashPass = await hashPassword(password);
 
-    const referralCode = ReferralCode.generateCode();
-
+    // const referralCode = ReferralCode.generateCode();
+    let referralCode;
+    if (role !== "seller") {
+      referralCode = ReferralCode.generateCode();
+    }
     const data: Prisma.UserCreateInput = {
       email,
       password: hashPass,
@@ -84,7 +87,7 @@ class UserService {
       last_name,
       phone_number,
       reference_code,
-      referral_code: referralCode[0],
+      referral_code: referralCode ? referralCode[0] : null,
     };
 
     let newUser;
@@ -117,6 +120,8 @@ class UserService {
 
           // add 10000 to last point amount
           const newPoint = (referrerPoint?.point || 0) + 10000;
+          const expirationDate = new Date();
+          expirationDate.setMonth(expirationDate.getMonth() + 3);
 
           if (referrerPoint) {
             // update referrer's point in voucherpoint
@@ -124,7 +129,7 @@ class UserService {
               where: { id: referrerPoint.id },
               data: {
                 point: newPoint,
-                expired_date: newUser.createdAt,
+                expired_date: expirationDate,
                 voucher: referrerPoint.voucher,
                 isValid: false,
               },
@@ -135,7 +140,7 @@ class UserService {
               data: {
                 user_id: referrer.id,
                 point: newPoint,
-                expired_date: newUser.createdAt,
+                expired_date: expirationDate,
                 voucher: 0,
                 isValid: false,
               },
