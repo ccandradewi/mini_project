@@ -12,12 +12,10 @@ const VerifyEmail = () => {
   useEffect(() => {
     const verifyToken = async () => {
       if (token) {
-        try {
-            
+        try {  
           const response = await axiosInstance().get(`/users/verification/${token}`);
-          console.log(token);
+
           if (response.status === 200) {
-            // Redirect to the login page after successful verification
             router.push('/users/v2');
           } else {
             console.error('Email verification failed:', response.statusText);
@@ -31,7 +29,6 @@ const VerifyEmail = () => {
     verifyToken();
   }, [token, router]);
 
-  // Redirect to the login page if the verification token is not provided
   useEffect(() => {
     if (!token) {
       router.push('/users/v2');
