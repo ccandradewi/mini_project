@@ -35,7 +35,7 @@ model User {
   address        String?
   gender         Gender?
   dob            DateTime?
-  avatar         String?
+  avatar         Bytes?    @db.LongBlob
   referral_code  String?
   reference_code String?
   isVerified     Boolean?  @default(false)
@@ -118,7 +118,7 @@ model Event {
   id          String        @id @default(cuid())
   user        User          @relation(fields: [user_id], references: [id])
   user_id     String
-  banner      String
+  banner      Bytes        @db.LongBlob
   title       String
   description String        @db.LongText
   start_time  DateTime

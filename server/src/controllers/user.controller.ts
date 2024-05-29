@@ -52,5 +52,22 @@ class UserController {
       next(error);
     }
   }
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      await userService.editUser(req);
+      res.status(201).send({ message: "Success update your profile" });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async renderAvatar(req: Request, res: Response, next: NextFunction) {
+    try {
+      const blob = await userService.render(req);
+      res.set("Content-type", "image/png");
+      res.send(blob);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 export default new UserController();

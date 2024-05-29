@@ -20,7 +20,7 @@ export type TUser = {
   address: string | null;
   gender: Gender | null;
   dob: Date | null;
-  avatar?: string | null;
+  avatar?: Buffer | null;
   referral_code?: string | null;
   reference_code?: string | null;
   createdAt?: Date;

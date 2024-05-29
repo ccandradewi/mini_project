@@ -8,6 +8,7 @@ import ReferralCode from "../libs/referral";
 import { transporter } from "../libs/nodemailer";
 import { SECRET_KEY } from "../config/config";
 import { verify } from "jsonwebtoken";
+import sharp from "sharp";
 class UserService {
   async userLogin(req: Request) {
     const { email, password } = req.body;
@@ -189,6 +190,30 @@ class UserService {
         id: user?.id,
       },
     });
+  }
+  async editUser(req: Request) {
+    const { id } = req.params;
+    const { file } = req;
+
+    const data: Prisma.UserUpdateInput = { ...req.body };
+    if (!file) throw new Error("No File Uploaded");
+    else {
+      const buffer = await sharp(req.file?.buffer).png().toBuffer();
+      console.log(buffer);
+      data.avatar = buffer;
+    }
+    return await prisma.user.update({
+      data,
+      where: { id },
+    });
+  }
+  async render(req: Request) {
+    const data = await prisma.user.findFirst({
+      where: {
+        id: req.params.id,
+      },
+    });
+    return data?.avatar;
   }
 }
 
