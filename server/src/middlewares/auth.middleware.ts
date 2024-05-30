@@ -13,3 +13,14 @@ export const verifyUser = (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
+
+// export const validateRefreshToken = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//   } catch (error) {
+//     next(error);
+//   }
+// };

@@ -1,5 +1,16 @@
+"use client";
+import { axiosInstance } from "@/lib/axios.config";
+import { useRouter } from "next/navigation";
 import React from "react";
 const Navbar = () => {
+  const router = useRouter();
+
+  // const logout = async () => {
+  //   try {
+  //     const response = await axiosInstance().post("/users/logout")
+  //   }
+  // }
+
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">

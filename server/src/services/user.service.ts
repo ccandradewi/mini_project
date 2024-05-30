@@ -228,6 +228,7 @@ class UserService {
       avatar: true,
       isVerified: true,
       phone_number: true,
+      role: true,
     };
 
     const data = await prisma.user.findUnique({
@@ -238,7 +239,7 @@ class UserService {
     });
     const access_token = createToken(data, "1hr");
 
-    return { access_token, isVerified: data?.isVerified };
+    return { access_token, isVerified: data?.isVerified, role: data?.role };
   }
 }
 
