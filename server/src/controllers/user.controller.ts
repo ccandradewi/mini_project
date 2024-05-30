@@ -44,11 +44,25 @@ class UserController {
       next(error);
     }
   }
-  
+
   async sendVerif(req: Request, res: Response, next: NextFunction) {
     try {
       await userService.sendVerification(req);
-      res.send({message: "verification success"});
+      res.send({ message: "verification success" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async validateUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { access_token, isVerified } = await userService.validate(req);
+
+      res.send({
+        message: "success",
+        isVerified,
+        access_token,
+      });
     } catch (error) {
       next(error);
     }

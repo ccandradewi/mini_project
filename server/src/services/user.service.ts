@@ -11,6 +11,7 @@ import { verify } from "jsonwebtoken";
 import fs, { readFile } from "fs";
 import { join } from "path";
 import { render } from "mustache";
+import { create } from "domain";
 
 class UserService {
   async userLogin(req: Request) {
@@ -123,7 +124,7 @@ class UserService {
         referrerPoint?.expired_date! > new Date()
           ? (referrerPoint?.point || 0) + 10000
           : 10000;
-          
+
       const expirationDate = new Date();
       expirationDate.setMonth(expirationDate.getMonth() + 3);
 
@@ -214,6 +215,30 @@ class UserService {
     } catch (error) {
       console.log("Error sending verification");
     }
+  }
+
+  async validate(req: Request) {
+    const select: Prisma.UserSelectScalar = {
+      id: true,
+      username: true,
+      email: true,
+      password: true,
+      first_name: true,
+      last_name: true,
+      avatar: true,
+      isVerified: true,
+      phone_number: true,
+    };
+
+    const data = await prisma.user.findUnique({
+      select,
+      where: {
+        id: req.user?.id,
+      },
+    });
+    const access_token = createToken(data, "1hr");
+
+    return { access_token, isVerified: data?.isVerified };
   }
 }
 
