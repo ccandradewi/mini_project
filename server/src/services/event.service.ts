@@ -33,7 +33,7 @@ class EventService {
       location_id,
       category_id,
       promotor,
-      //   promo,
+      Promo,
     } = req.body;
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -65,11 +65,35 @@ class EventService {
         },
       },
       promotor,
-      //  promo,
+      Promo,
     };
 
     return await prisma.event.create({
       data,
+    });
+  }
+  async getEventsByLocation(locationId: string) {
+    return await prisma.event.findMany({
+      where: { location_id: locationId },
+      include: {
+        location: true,
+        category: true,
+        Ticket: true,
+        Promo: true,
+        user: true,
+      },
+    });
+  }
+  async getEventsByCategory(categoryId: string) {
+    return await prisma.event.findMany({
+      where: { category_id: categoryId },
+      include: {
+        location: true,
+        category: true,
+        Ticket: true,
+        Promo: true,
+        user: true,
+      },
     });
   }
 }

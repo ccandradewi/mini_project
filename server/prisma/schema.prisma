@@ -131,7 +131,7 @@ model Event {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   Ticket      Ticket[]
-  Promo       Promo
+  Promo       Promo?
 
   @@index([title])
   @@map("events")
