@@ -1,19 +1,30 @@
-import { Category, EventLocation, Ticket, User, Promo } from "@prisma/client";
+import {
+  Ticket,
+  Promo,
+  LocationName,
+  CategoryName,
+  Order,
+  Type,
+} from "@prisma/client";
 
 export type TEvent = {
-  id: String;
-  user_id: User;
-  banner: String;
-  title: String;
-  description: String;
+  id: string;
+  user_id: string;
+  banner: Buffer;
+  title: string;
+  description: string;
   start_time: Date;
   end_time: Date;
-  venue: String;
-  location_id: EventLocation;
-  category_id: Category;
-  promotor: String;
-  createdAt?: Date;
-  updatedAt?: Date;
-  ticket: Ticket[];
-  promo: Promo;
-} | null;
+  venue: string;
+  city: LocationName;
+  location: string;
+  category: CategoryName;
+  promotor: string;
+  type: Type;
+  createdAt: Date;
+  updatedAt: Date;
+  promo?: Promo | null;
+  start_promo?: Date | null;
+  end_promo?: Date | null;
+  order?: Order | null;
+};

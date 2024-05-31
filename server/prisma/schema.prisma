@@ -38,9 +38,11 @@ model User {
   avatar         String?
   referral_code  String?
   reference_code String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isVerified     Boolean?  @default(false)
+  bankAccount    String?
+  bank           String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   VoucherPoint VoucherPoint[]
   Event        Event[]
@@ -83,55 +85,40 @@ enum CategoryName {
   THEATRE
 }
 
-model Category {
-  id            String       @id @default(cuid())
-  category_name CategoryName
-
-  Event Event[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("categories")
-}
-
-model EventLocation {
-  id       String       @id @default(cuid())
-  location LocationName
-
-  Event Event[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("locations")
-}
-
 enum Promo {
   TEN_PERCENT         @map("10%")
   TWENTY_FIVE_PERCENT @map("25%")
   FIFTY_PERCENT       @map("50%")
 }
 
+enum Type {
+  FREE
+  PAID
+}
+
 model Event {
-  id          String        @id @default(cuid())
-  user        User          @relation(fields: [user_id], references: [id])
+  id          String       @id @default(cuid())
+  user        User         @relation(fields: [user_id], references: [id])
   user_id     String
-  banner      String
+  banner      Bytes        @db.LongBlob
   title       String
-  description String        @db.LongText
+  description String       @db.LongText
   start_time  DateTime
   end_time    DateTime
   venue       String
-  location_id String
-  location    EventLocation @relation(fields: [location_id], references: [id])
-  category_id String
-  category    Category      @relation(fields: [category_id], references: [id])
+  city        LocationName
+  location    String
+  category    CategoryName
   promotor    String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Ticket      Ticket[]
-  Promo       Promo?
+  type        Type
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  ticket      Ticket[]
+  promo       Promo?
+  start_promo DateTime?
+  end_promo   DateTime?
+
+  Order Order[]
 
   @@index([title])
   @@map("events")
@@ -139,8 +126,8 @@ model Event {
 
 enum TicketType {
   REGULAR
-  DELUXE
   VIP
+  FREE
 }
 
 model Ticket {
@@ -165,39 +152,44 @@ enum StatusOrder {
   PENDING
 }
 
-model Order {
-  id          String        @id @default(cuid())
-  user        User          @relation(fields: [user_id], references: [id])
-  user_id     String
-  date        DateTime
-  status      StatusOrder
-  OrderDetail OrderDetail[]
-  Review      Review[]
+enum PaymentMethod {
+  VIRTUAL_ACCOUNT
+  GOPAY
+  BANK_TRANSFER
+  SHOPEEPAY
+  CREDIT_DEBIT_CARD
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Order {
+  id             String        @id @default(cuid())
+  user           User          @relation(fields: [buyer_id], references: [id])
+  buyer_id       String
+  event          Event         @relation(fields: [event_id], references: [id])
+  event_id       String
+  date           DateTime
+  payment_date   DateTime
+  payment_method PaymentMethod
+  payment_proof  Bytes         @db.LongBlob
+  status         StatusOrder
+  OrderDetail    OrderDetail[]
+  Review         Review[]
+  total_order    Decimal
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@map("orders")
 }
 
-enum PaymentMethod {
-  VIRTUAL_ACCOUNT
-  CREDIT_DEBIT_CARD
-  E_WALLET
-}
-
 model OrderDetail {
-  id             String        @id @default(cuid())
-  order_id       String
-  order          Order         @relation(fields: [order_id], references: [id])
-  ticket_id      String
-  ticket         Ticket        @relation(fields: [ticket_id], references: [id])
-  payment_date   DateTime
-  payment_method PaymentMethod
-  total_ticket   Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  order_id     String
+  order        Order    @relation(fields: [order_id], references: [id])
+  ticket_id    String
+  ticket       Ticket   @relation(fields: [ticket_id], references: [id])
+  total_ticket Int
+  total_price  Decimal
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("order_details")
 }

@@ -1,99 +1,150 @@
 import { Request } from "express";
 import { prisma } from "../libs/prisma";
-import { Prisma } from "@prisma/client";
+import { CategoryName, LocationName, Prisma } from "@prisma/client";
+import { TEvent } from "../model/event.model";
+import sharp from "sharp";
 
 class EventService {
   async getAll(req: Request) {
     const data = await prisma.event.findMany();
+    return data;
   }
+
   async getEventByTitle(req: Request) {
-    const { title } = req.params;
+    const { title } = req.query;
+    if (!title || typeof title != "string") {
+      throw new Error("invalid search");
+    }
     const data = await prisma.event.findFirst({
       where: {
-        title: title,
+        title: { contains: title },
       },
-      include: {
-        user: true,
+      select: {
+        title: true,
+        start_time: true,
+        ticket: true,
         location: true,
         category: true,
-        Ticket: true,
+        banner: true,
+        promotor: true,
       },
     });
     if (!data) throw new Error("Event Not Found");
+    return data;
   }
-  async createEvent(req: Request) {
+  async getByfilter(req: Request) {
+    const { city, category } = req.query;
+    let filter: any = {};
+    if (city) {
+      filter.city = city as LocationName;
+    }
+    if (location) {
+      filter.category = category as CategoryName;
+    }
+    const data = await prisma.event.findMany({
+      where: filter,
+      select: {
+        title: true,
+        start_time: true,
+        ticket: true,
+        location: true,
+        category: true,
+        banner: true,
+        promotor: true,
+      },
+    });
+    if (!data) throw new Error("Event Not Found");
+    return data;
+  }
+  async getDetailEvent(req: Request) {
+    const { eventId } = req.params;
+    const data = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: {
+        banner: true,
+        title: true,
+        description: true,
+        start_time: true,
+        end_time: true,
+        venue: true,
+        city: true,
+        location: true,
+        category: true,
+        promotor: true,
+        type: true,
+      },
+    });
+    return data;
+  }
+  async createEvent(req: Request): Promise<TEvent> {
+    const { userId } = req.params;
+    const { file } = req;
+    const buffer = await sharp(req.file?.buffer).png().toBuffer();
+    if (!file) throw new Error("No file uploaded");
     const {
-      userId,
-      banner,
       title,
       description,
       start_time,
       end_time,
       venue,
-      location_id,
-      category_id,
+      city,
+      location,
+      category,
       promotor,
-      Promo,
-    } = req.body;
-    const user = await prisma.user.findUnique({
+      type,
+      promo,
+      start_promo,
+      end_promo,
+    } = req.body as TEvent;
+    const existingEvent = await prisma.event.findFirst({
+      where: { title },
+    });
+    if (existingEvent)
+      throw new Error(
+        "There is event with the same title. Please choose different title"
+      );
+    if (promo && (!start_promo || !end_promo)) {
+      throw new Error("plese enter the duration of the promo");
+    }
+    const getUser = (await prisma.user.findFirst({
       where: { id: userId },
+      select: { id: true },
+    })) as { id: string };
+    const createEvent = prisma.event.create({
+      data: {
+        user_id: getUser.id,
+        banner: buffer,
+        title,
+        description,
+        start_time: new Date(start_time).toISOString(),
+        end_time: new Date(end_time),
+        venue,
+        city,
+        location,
+        category,
+        promotor,
+        type,
+        promo,
+        start_promo,
+        end_promo,
+      },
     });
-
-    if (!user) throw new Error("User not found");
-    if (user.role !== "seller")
-      throw new Error("Only users with the seller role can create events");
-    const data: Prisma.EventCreateInput = {
-      user: {
-        connect: {
-          id: userId,
-        },
-      },
-      banner,
-      title,
-      description,
-      start_time: new Date(start_time),
-      end_time: new Date(end_time),
-      venue,
-      location: {
-        connect: {
-          id: location_id,
-        },
-      },
-      category: {
-        connect: {
-          id: category_id,
-        },
-      },
-      promotor,
-      Promo,
-    };
-
-    return await prisma.event.create({
-      data,
-    });
+    return createEvent;
   }
-  async getEventsByLocation(locationId: string) {
-    return await prisma.event.findMany({
-      where: { location_id: locationId },
-      include: {
-        location: true,
-        category: true,
-        Ticket: true,
-        Promo: true,
-        user: true,
+  async renderBanner(req: Request) {
+    const data = await prisma.event.findFirst({
+      where: {
+        id: req.params.id,
       },
     });
+    return data?.banner;
   }
-  async getEventsByCategory(categoryId: string) {
-    return await prisma.event.findMany({
-      where: { category_id: categoryId },
-      include: {
-        location: true,
-        category: true,
-        Ticket: true,
-        Promo: true,
-        user: true,
-      },
+  async deleteEvent(req: Request) {
+    const { eventId } = req.params;
+    return await prisma.event.delete({
+      where: { id: eventId },
     });
   }
 }
+
+export default new EventService();
