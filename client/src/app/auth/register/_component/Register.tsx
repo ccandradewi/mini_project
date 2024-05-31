@@ -43,7 +43,7 @@ const Register = () => {
       try {
         console.log("masuk");
         await axiosInstance().post("/users/v1", values);
-        window.location.reload;
+        router.push("/verification");
         // alert(data.message);
         //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
@@ -249,7 +249,7 @@ const Register = () => {
                   <p className="m-0 text-secondary text-end">
                     Already have an account?{" "}
                     <Link
-                      href="/users/v2"
+                      href="/auth/login"
                       passHref
                       className="link-primary text-decoration-none"
                     >

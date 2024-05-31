@@ -7,21 +7,23 @@ import { axiosInstance } from "@/lib/axios.config";
 const VerifyEmail = () => {
   const router = useRouter();
   const params = useParams();
-  const { token } = params; 
+  const { token } = params;
 
   useEffect(() => {
     const verifyToken = async () => {
       if (token) {
-        try {  
-          const response = await axiosInstance().get(`/users/verification/${token}`);
+        try {
+          const response = await axiosInstance().get(
+            `/users/verification/${token}`
+          );
 
           if (response.status === 200) {
-            router.push('/users/v2');
+            router.push("/auth/login");
           } else {
-            console.error('Email verification failed:', response.statusText);
+            console.error("Email verification failed:", response.statusText);
           }
         } catch (error) {
-          console.error('Error verifying email:', error);
+          console.error("Error verifying email:", error);
         }
       }
     };
@@ -31,7 +33,7 @@ const VerifyEmail = () => {
 
   useEffect(() => {
     if (!token) {
-      router.push('/users/v2');
+      router.push("/auth/login");
     }
   }, [token, router]);
 

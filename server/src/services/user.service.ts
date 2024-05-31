@@ -172,7 +172,7 @@ class UserService {
         },
       });
 
-    const verifyToken = createToken({ id: newUser.id }, "5m");
+    const verifyToken = createToken({ id: newUser.id }, "30m");
 
     const template = fs
       .readFileSync(__dirname + "/../templates/verification.html")
@@ -181,7 +181,7 @@ class UserService {
     const html = render(template, {
       email: data.email,
       first_name: data.first_name,
-      verify_url: `http://localhost:3000/users/verification/${verifyToken}`,
+      verify_url: `http://localhost:3000/verify/${verifyToken}`,
     });
 
     console.log("rendering template");
