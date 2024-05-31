@@ -10,12 +10,13 @@ export default function AuthProvider({
 }: {
   children?: React.ReactNode;
 }) {
-  // const dispatch = useAppDispatch();
-  // const { data } = getValidAuthTokens();
-  // const fetchUser = async (storage: TUser) =>
-  //   await dispatch(keepLogin(storage));
-  // useEffect(() => {
-  //   if (data) fetchUser(data);
-  // }, []);
+  const dispatch = useAppDispatch();
+
+  const fetchUser = async () => await dispatch(keepLogin());
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   return children;
 }

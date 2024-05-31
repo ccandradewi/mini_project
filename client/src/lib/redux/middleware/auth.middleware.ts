@@ -39,7 +39,7 @@ export const userLogin = ({ email, password }: TUser) => {
   };
 };
 
-export const keepLogin = (storage: any) => {
+export const keepLogin = () => {
   return async (dispatch: Dispatch) => {
     try {
       const token = getCookie("access_token");
