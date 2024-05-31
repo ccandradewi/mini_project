@@ -6,7 +6,12 @@ import { useFormik } from "formik";
 import { axiosInstance } from "@/lib/axios.config";
 import Link from "next/link";
 import { TUser } from "@/models/user.model";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+
 const Register = () => {
+  const router = useRouter();
+
   YupPassword(Yup);
 
   const initialValues = {
@@ -37,12 +42,13 @@ const Register = () => {
     onSubmit: async (values: TUser) => {
       try {
         console.log("masuk");
-        const { data } = await axiosInstance().post("/users/v1", values);
-        alert(data.message);
+        await axiosInstance().post("/users/v1", values);
+        router.push("/verification");
+        // alert(data.message);
         //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
         console.log(error);
-        alert("username/email already registered");
+        if (error instanceof AxiosError) alert(error.response?.data.message);
       }
     },
   });
@@ -208,6 +214,9 @@ const Register = () => {
                       placeholder="Phone Number"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.phone_number}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="reference_code" className="form-label">
@@ -240,7 +249,7 @@ const Register = () => {
                   <p className="m-0 text-secondary text-end">
                     Already have an account?{" "}
                     <Link
-                      href="/users/v2"
+                      href="/auth/login"
                       passHref
                       className="link-primary text-decoration-none"
                     >
