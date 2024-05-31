@@ -222,7 +222,6 @@ class UserService {
       id: true,
       username: true,
       email: true,
-      password: true,
       first_name: true,
       last_name: true,
       avatar: true,
@@ -237,9 +236,10 @@ class UserService {
         id: req.user?.id,
       },
     });
+
     const access_token = createToken(data, "1hr");
 
-    return { access_token, isVerified: data?.isVerified, role: data?.role };
+    return { access_token, isVerified: data?.isVerified };
   }
 }
 
