@@ -2,17 +2,16 @@ import { type NextFunction, type Response, type Request } from "express";
 import userService from "../services/user.service";
 
 class UserController {
-
-    async register(req: Request, res: Response, next: NextFunction) {
-        try {
-          await userService.userRegister(req);
-          res.status(201).send({
-            message: "new user has been register",
-          });
-        } catch (error) {
-          next(error);
-        }
-      }
+  async register(req: Request, res: Response, next: NextFunction) {
+    try {
+      await userService.userRegister(req);
+      res.status(201).send({
+        message: "new user has been register",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
@@ -28,7 +27,7 @@ class UserController {
             message: "Login as seller",
             role: "seller",
             url: "/dashboard",
-          })
+          });
       } else if (role && role === "buyer") {
         res
           .cookie("access_token", accessToken)
@@ -36,11 +35,34 @@ class UserController {
           .send({
             message: "Login as buyer",
             role: "buyer",
-            url: "/"
-          })
+            url: "/",
+          });
       } else {
         res.status(400).send("Role is invalid");
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async sendVerif(req: Request, res: Response, next: NextFunction) {
+    try {
+      await userService.sendVerification(req);
+      res.send({ message: "verification success" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async validateUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { access_token, isVerified } = await userService.validate(req);
+
+      res.send({
+        message: "success",
+        isVerified,
+        access_token,
+      });
     } catch (error) {
       next(error);
     }

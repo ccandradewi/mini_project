@@ -4,16 +4,25 @@ import YupPassword from "yup-password";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { axiosInstance } from "@/lib/axios.config";
+import Link from "next/link";
+import { TUser } from "@/models/user.model";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+
 const Register = () => {
+  const router = useRouter();
+
   YupPassword(Yup);
+
   const initialValues = {
     email: "",
     password: "",
-    role: "",
+    role: "buyer",
     username: "",
     first_name: "",
     last_name: "",
     phone_number: "",
+    reference_code: "",
   };
   const formik = useFormik({
     initialValues,
@@ -30,20 +39,25 @@ const Register = () => {
         .required(),
       reference_code: Yup.string(),
     }),
-    onSubmit: async (values) => {
+    onSubmit: async (values: TUser) => {
       try {
-        const { data } = await axiosInstance().post("/users/v1", values);
-        alert(data.message); //alert bisa custom pake shadcn atau sweetalert
+        console.log("masuk");
+        await axiosInstance().post("/users/v1", values);
+        router.push("/verification");
+        // alert(data.message);
+        //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
-        alert("username/email already registered");
+        console.log(error);
+        if (error instanceof AxiosError) alert(error.response?.data.message);
       }
     },
   });
   useEffect(() => {
+    console.log(formik.values);
     if (formik.values.role === "seller") {
       formik.setFieldValue("reference_code", "");
     }
-  }, [formik.values.role]);
+  }, [formik.values]);
   return (
     <section className="p-3 p-md-4 p-xl-5">
       <div className="container">
@@ -85,7 +99,10 @@ const Register = () => {
                       {...formik.getFieldProps("first_name")}
                       placeholder="First Name"
                       required
-                    />
+                    />{" "}
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.first_name}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="last_name" className="form-label">
@@ -99,7 +116,11 @@ const Register = () => {
                       placeholder="Last Name"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.last_name}
+                    </div>
                   </div>
+
                   <div className="col-12">
                     <label htmlFor="email" className="form-label">
                       Email
@@ -113,6 +134,9 @@ const Register = () => {
                       placeholder="name@example.com"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.email}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="username" className="form-label">
@@ -126,6 +150,9 @@ const Register = () => {
                       placeholder="Username"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.username}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="password" className="form-label">
@@ -138,6 +165,9 @@ const Register = () => {
                       {...formik.getFieldProps("password")}
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.password}
+                    </div>
                   </div>
                   <div className="col-md-6 mb-4">
                     <h6 className="mb-2 pb-1">Role: </h6>
@@ -146,10 +176,11 @@ const Register = () => {
                         className="form-check-input"
                         type="radio"
                         name="role"
-                        id="role_buyer"
                         value="buyer"
                         checked={formik.values.role === "buyer"}
-                        onChange={formik.handleChange}
+                        onChange={(e) =>
+                          formik.setFieldValue("role", e.target.value)
+                        }
                       />
                       <label className="form-check-label" htmlFor="role_buyer">
                         Buyer
@@ -160,10 +191,11 @@ const Register = () => {
                         className="form-check-input"
                         type="radio"
                         name="role"
-                        id="role_seller"
                         value="seller"
                         checked={formik.values.role === "seller"}
-                        onChange={formik.handleChange}
+                        onChange={(e) =>
+                          formik.setFieldValue("role", e.target.value)
+                        }
                       />
                       <label className="form-check-label" htmlFor="role_seller">
                         Seller
@@ -182,6 +214,9 @@ const Register = () => {
                       placeholder="Phone Number"
                       required
                     />
+                    <div className=" text-red-700 text-xs">
+                      {formik.errors.phone_number}
+                    </div>
                   </div>
                   <div className="col-12">
                     <label htmlFor="reference_code" className="form-label">
@@ -193,7 +228,7 @@ const Register = () => {
                       id="reference_code"
                       {...formik.getFieldProps("reference_code")}
                       placeholder="for example: hab239"
-                      disabled={formik.values.role === "seller"}
+                      disabled={formik.values.role == "seller"}
                     />
                   </div>
                   <div className="col-12">
@@ -213,9 +248,13 @@ const Register = () => {
                   <hr className="mt-5 mb-4 border-secondary-subtle" />
                   <p className="m-0 text-secondary text-end">
                     Already have an account?{" "}
-                    <a href="#!" className="link-primary text-decoration-none">
+                    <Link
+                      href="/auth/login"
+                      passHref
+                      className="link-primary text-decoration-none"
+                    >
                       Sign in
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </div>
