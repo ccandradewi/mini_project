@@ -12,15 +12,28 @@ class EventRouter {
   }
   initializedRoutes() {
     this.router.get("/", eventController.getAllEvent);
-    this.router.get("/:eventId", eventController.getEventDetail);
-    this.router.get("/title", eventController.getEventByTitle);
-    this.router.get("/event1", eventController.filterEvent);
+    this.router.get("/detai/:eventId", eventController.getEventDetail);
+    this.router.get("/title", eventController.getEventTitle);
+    this.router.get("/filter", eventController.filterEvent);
+    this.router.get(
+      "/myEvent",
+      verifyUser,
+      verifySeller,
+      eventController.getBySeller
+    );
     this.router.post(
-      "/event2",
+      "/event",
       verifyUser,
       verifySeller,
       blobUploader().single("image"),
       eventController.createEvent
+    );
+    this.router.patch(
+      "/:eventId",
+      verifyUser,
+      verifySeller,
+      blobUploader().single("image"),
+      eventController.updateEvent
     );
     this.router.delete(
       "/:eventId",

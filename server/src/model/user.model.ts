@@ -1,11 +1,4 @@
-import {
-  Event,
-  Gender,
-  Order,
-  Review,
-  Role,
-  VoucherPoint,
-} from "@prisma/client";
+import { Gender, Role } from "@prisma/client";
 
 export type TUser = {
   id: string;

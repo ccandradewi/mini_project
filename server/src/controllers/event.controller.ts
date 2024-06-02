@@ -24,11 +24,23 @@ class EventCotroller {
       next(error);
     }
   }
-  async getEventByTitle(req: Request, res: Response, next: NextFunction) {
+  async getEventTitle(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await eventService.getEventByTitle(req);
       return res.send({
         message: "Event by title",
+        data,
+      });
+    } catch (error) {
+      console.error("Error getting event by title:", error);
+      next(error);
+    }
+  }
+  async getBySeller(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await eventService.getBySeller(req);
+      return res.send({
+        message: "All event that has been created",
         data,
       });
     } catch (error) {
@@ -51,6 +63,17 @@ class EventCotroller {
       const data = await eventService.createEvent(req);
       return res.send({
         message: "New Event has been created",
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateEvent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await eventService.updateEvent(req);
+      return res.send({
+        message: "event has been updated",
         data,
       });
     } catch (error) {

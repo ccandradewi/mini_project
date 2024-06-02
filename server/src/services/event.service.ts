@@ -12,15 +12,18 @@ class EventService {
 
   async getEventByTitle(req: Request) {
     const { title } = req.query;
-    if (!title || typeof title != "string") {
+    if (!title || typeof title !== "string") {
+      console.error("Invalid search query parameter:", title);
       throw new Error("invalid search");
     }
-    const data = await prisma.event.findFirst({
+    console.log("Searching for events with title containing:", title);
+    const data = await prisma.event.findMany({
       where: {
         title: { contains: title },
       },
       select: {
         title: true,
+        city: true,
         start_time: true,
         ticket: true,
         location: true,
@@ -29,16 +32,35 @@ class EventService {
         promotor: true,
       },
     });
-    if (!data) throw new Error("Event Not Found");
+    if (!data || data.length === 0) {
+      throw new Error("Event Not Found");
+    }
+    console.log("Found events:", data);
+    return data;
+  }
+  async getBySeller(req: Request) {
+    const data = await prisma.event.findMany({
+      where: {
+        user_id: req.user?.id,
+      },
+      select: {
+        title: true,
+        description: true,
+        city: true,
+        category: true,
+        start_time: true,
+        end_time: true,
+      },
+    });
     return data;
   }
   async getByfilter(req: Request) {
     const { city, category } = req.query;
     let filter: any = {};
-    if (city) {
+    if (city && typeof city === "string") {
       filter.city = city as LocationName;
     }
-    if (location) {
+    if (category && typeof category === "string") {
       filter.category = category as CategoryName;
     }
     const data = await prisma.event.findMany({
@@ -130,6 +152,19 @@ class EventService {
       },
     });
     return createEvent;
+  }
+  async updateEvent(req: Request) {
+    const { eventId } = req.params;
+    const { file } = req;
+    const data: Prisma.EventUpdateInput = { ...req.body };
+    if (file) {
+      const buffer = await sharp(req.file?.buffer).png().toBuffer();
+      data.banner = buffer;
+    }
+    return await prisma.event.update({
+      data,
+      where: { id: eventId, user_id: req.user?.id },
+    });
   }
   async renderBanner(req: Request) {
     const data = await prisma.event.findFirst({
