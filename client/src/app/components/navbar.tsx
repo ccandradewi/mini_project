@@ -48,34 +48,39 @@ export default function Navbar({}: Props) {
 
   return (
     <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl px-4 flex flex-row py-3">
-        {/* LOGO */}
-        <div className="flex items-center w-[100px]">
-          <img
-            src="https://i.ibb.co.com/yqxWWt2/Tickzy-2.png"
-            alt="tickzy logo"
-          />
-        </div>
-
-        {/* // SEARCH */}
-        <div className="flex items-center space-x-4 flex-grow">
-          <div className="relative w-full max-w-xs">
-            <input
-              type="text"
-              placeholder="Search"
-              className="block w-full py-2 px-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+      <div className="w-screen px-4 flex justify-between items-center py-3">
+        <div className="flex flex-row gap-10">
+          {/* LOGO */}
+          <div className="w-[100px] lg:ml-10">
+            <img
+              src="https://i.ibb.co.com/yqxWWt2/Tickzy-2.png"
+              alt="tickzy logo"
             />
           </div>
 
+          {/* SEARCH */}
+          <div className="flex">
+            <div className="relative ">
+              <input
+                type="text"
+                placeholder="Search"
+                className="block w-[400px] py-2 px-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* BUTTONS/PROFILE */}
+        <div className="flex items-center justify-center gap-3">
           {loggedinUser.username && (
             <div className="text-gray-700">
-              Welcome, {loggedinUser.first_name}
+              Welcome, <b>{loggedinUser.first_name}!</b>
             </div>
           )}
           {loggedinUser.username ? (
             <div className="relative" ref={dropdownRef}>
               <button
-                className="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300"
+                className="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 lg:mr-10"
                 id="user-menu-button"
                 aria-expanded={dropdownOpen}
                 aria-haspopup="true"
@@ -131,22 +136,20 @@ export default function Navbar({}: Props) {
               )}
             </div>
           ) : (
-            <div className="flex gap-2 ml-auto">
-              {" "}
-              {/* Utilizing ml-auto */}
+            <React.Fragment>
               <button
-                className="bg-[#5180C6] hover:bg-[#3c567e] text-white font-bold px-4 py-2 rounded"
+                className=" hover:bg-[#d2dded] hover:rounded-full text-zinc-600 font-base px-4 py-2"
                 onClick={loginButton}
               >
                 Login
               </button>
               <button
-                className="bg-[#c0b3ad] hover:bg-[#e4dbd7] text-white font-bold px-4 py-2 rounded"
+                className=" hover:bg-[#d2dded] hover:rounded-full text-zinc-600 font-base px-4 py-2 lg:mr-10"
                 onClick={registerButton}
               >
                 Sign Up
               </button>
-            </div>
+            </React.Fragment>
           )}
         </div>
       </div>
