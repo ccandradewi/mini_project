@@ -22,7 +22,7 @@ class EventRouter {
       eventController.getBySeller
     );
     this.router.post(
-      "/event",
+      "/",
       verifyUser,
       verifySeller,
       blobUploader().single("image"),

@@ -60,10 +60,9 @@ class EventCotroller {
   }
   async createEvent(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await eventService.createEvent(req);
+      await eventService.createEvent(req);
       return res.send({
         message: "New Event has been created",
-        data,
       });
     } catch (error) {
       next(error);
@@ -71,10 +70,9 @@ class EventCotroller {
   }
   async updateEvent(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await eventService.updateEvent(req);
+      await eventService.updateEvent(req);
       return res.send({
         message: "event has been updated",
-        data,
       });
     } catch (error) {
       next(error);

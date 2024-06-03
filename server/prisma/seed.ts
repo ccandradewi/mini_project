@@ -7,7 +7,7 @@
 //   await prisma.event.createMany({
 //     data: [
 //       {
-//         user_id: "user1", // Replace with actual user ID
+//         user_id: "clwykv5o60000kpn5ddvqwhde", // Replace with actual user ID
 //         banner: Buffer.from(""), // Placeholder for actual banner data
 //         title: "Jakarta Music Festival",
 //         description:
@@ -24,7 +24,7 @@
 //         end_promo: null,
 //       },
 //       {
-//         user_id: "user2", // Replace with actual user ID
+//         user_id: "clwym16oy0001s9fx6f1g42kr", // Replace with actual user ID
 //         banner: Buffer.from(""), // Placeholder for actual banner data
 //         title: "Bali Art Exhibition",
 //         description:
@@ -41,7 +41,7 @@
 //         end_promo: null,
 //       },
 //       {
-//         user_id: "user3", // Replace with actual user ID
+//         user_id: "clwym5ial0002s9fxjwnsba7f", // Replace with actual user ID
 //         banner: Buffer.from(""), // Placeholder for actual banner data
 //         title: "Surabaya Tech Conference",
 //         description:
@@ -58,7 +58,7 @@
 //         end_promo: null,
 //       },
 //       {
-//         user_id: "user4", // Replace with actual user ID
+//         user_id: "clwykv5o60000kpn5ddvqwhde", // Replace with actual user ID
 //         banner: Buffer.from(""), // Placeholder for actual banner data
 //         title: "Sumatra Marathon",
 //         description:
@@ -75,7 +75,7 @@
 //         end_promo: null,
 //       },
 //       {
-//         user_id: "user5", // Replace with actual user ID
+//         user_id: "clwym5ial0002s9fxjwnsba7f", // Replace with actual user ID
 //         banner: Buffer.from(""), // Placeholder for actual banner data
 //         title: "Makassar Theatre Festival",
 //         description:

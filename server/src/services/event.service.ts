@@ -101,8 +101,7 @@ class EventService {
   async createEvent(req: Request): Promise<TEvent> {
     const { userId } = req.params;
     const { file } = req;
-    const buffer = await sharp(req.file?.buffer).png().toBuffer();
-    if (!file) throw new Error("No file uploaded");
+
     const {
       title,
       description,
@@ -118,6 +117,9 @@ class EventService {
       start_promo,
       end_promo,
     } = req.body as TEvent;
+
+    if (!file) throw new Error("No file uploaded");
+    const buffer = await sharp(req.file?.buffer).png().toBuffer();
     const existingEvent = await prisma.event.findFirst({
       where: { title },
     });
@@ -132,7 +134,11 @@ class EventService {
       where: { id: userId },
       select: { id: true },
     })) as { id: string };
-    const createEvent = prisma.event.create({
+    if (!getUser) {
+      throw new Error("User not found.");
+    }
+
+    const createEvent = await prisma.event.create({
       data: {
         user_id: getUser.id,
         banner: buffer,
@@ -151,16 +157,18 @@ class EventService {
         end_promo,
       },
     });
+    console.log(createEvent);
+    console.log(req);
     return createEvent;
   }
   async updateEvent(req: Request) {
     const { eventId } = req.params;
     const { file } = req;
     const data: Prisma.EventUpdateInput = { ...req.body };
-    if (file) {
-      const buffer = await sharp(req.file?.buffer).png().toBuffer();
-      data.banner = buffer;
-    }
+    // if (file) {
+    //   const buffer = await sharp(req.file?.buffer).png().toBuffer();
+    //   data.banner = buffer;
+    // }
     return await prisma.event.update({
       data,
       where: { id: eventId, user_id: req.user?.id },
