@@ -97,23 +97,25 @@ enum Type {
 }
 
 model Event {
-  id          String       @id @default(cuid())
-  user        User         @relation(fields: [user_id], references: [id])
-  user_id     String
-  banner      Bytes        @db.LongBlob
-  title       String
-  description String       @db.LongText
-  start_time  DateTime
-  end_time    DateTime
-  venue       String
-  city        LocationName
-  location    String
-  category    CategoryName
-  promotor    String
-  type        Type
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  ticket      Ticket[]
+  id           String       @id @default(cuid())
+  user         User         @relation(fields: [user_id], references: [id])
+  user_id      String
+  banner       Bytes        @db.LongBlob
+  title        String
+  description  String       @db.LongText
+  start_time   DateTime
+  end_time     DateTime
+  venue        String
+  city         LocationName
+  location     String
+  category     CategoryName
+  promotor     String
+  type         Type
+  availability Int
+  ticket_price Float?       @db.Double
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
   promo       Promo?
   start_promo DateTime?
   end_promo   DateTime?
@@ -122,28 +124,6 @@ model Event {
 
   @@index([title])
   @@map("events")
-}
-
-enum TicketType {
-  REGULAR
-  VIP
-  FREE
-}
-
-model Ticket {
-  id           String     @id @default(cuid())
-  event_id     String
-  event        Event      @relation(fields: [event_id], references: [id])
-  ticket_type  TicketType
-  price        Decimal
-  availability Int
-
-  OrderDetail OrderDetail[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("tickets")
 }
 
 enum StatusOrder {
@@ -166,32 +146,18 @@ model Order {
   buyer_id       String
   event          Event         @relation(fields: [event_id], references: [id])
   event_id       String
+  total_ticket   Int
+  total_price    Float         @db.Double
   date           DateTime
   payment_date   DateTime
   payment_method PaymentMethod
   payment_proof  Bytes         @db.LongBlob
   status         StatusOrder
-  OrderDetail    OrderDetail[]
   Review         Review[]
-  total_order    Decimal
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
   @@map("orders")
-}
-
-model OrderDetail {
-  id           String   @id @default(cuid())
-  order_id     String
-  order        Order    @relation(fields: [order_id], references: [id])
-  ticket_id    String
-  ticket       Ticket   @relation(fields: [ticket_id], references: [id])
-  total_ticket Int
-  total_price  Decimal
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("order_details")
 }
 
 model Review {
