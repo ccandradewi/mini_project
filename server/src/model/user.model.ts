@@ -19,3 +19,8 @@ export type TUser = {
   createdAt?: Date;
   updatedAt?: Date;
 } | null;
+
+export type TDecode = {
+  type: string;
+  user: TUser;
+};
