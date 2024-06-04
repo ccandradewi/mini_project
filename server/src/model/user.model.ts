@@ -1,11 +1,4 @@
-import {
-  Event,
-  Gender,
-  Order,
-  Review,
-  Role,
-  VoucherPoint,
-} from "@prisma/client";
+import { Gender, Role } from "@prisma/client";
 
 export type TUser = {
   id: string;
@@ -26,3 +19,8 @@ export type TUser = {
   createdAt?: Date;
   updatedAt?: Date;
 } | null;
+
+export type TDecode = {
+  type: string;
+  user: TUser;
+};

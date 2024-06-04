@@ -7,6 +7,7 @@ import express, {
   type Response,
 } from "express";
 import userRouter from "./routers/user.router";
+import eventRouter from "./routers/event.router";
 
 export class App {
   private app: Application;
@@ -22,7 +23,7 @@ export class App {
       res.send("Welcome to Ticketing App API!");
     });
     this.app.use("/users", userRouter.getRouter());
-    // this.app.use("/event", eventRouter.getRouter())
+    this.app.use("/event", eventRouter.getRouter());
   }
 
   private errorHandler() {

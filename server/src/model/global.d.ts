@@ -5,6 +5,7 @@ declare global {
     interface Request {
       user: TUser;
       token: string;
+      file?: Express.Multer.File;
     }
   }
 }
