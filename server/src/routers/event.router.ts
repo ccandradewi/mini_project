@@ -2,7 +2,10 @@ import { Router } from "express";
 import eventController from "../controllers/event.controller";
 import { verifySeller } from "../middlewares/role.middleware";
 import { blobUploader } from "../libs/multer";
-import { verifyUser } from "../middlewares/auth.middleware";
+import {
+  validateAccessToken,
+  verifyUser,
+} from "../middlewares/auth.middleware";
 
 class EventRouter {
   private router: Router;
@@ -18,12 +21,14 @@ class EventRouter {
     this.router.get(
       "/myEvent",
       verifyUser,
+      // validateAccessToken,
       verifySeller,
       eventController.getBySeller
     );
     this.router.post(
       "/",
       verifyUser,
+      // validateAccessToken,
       verifySeller,
       blobUploader().single("image"),
       eventController.createEvent
@@ -31,6 +36,7 @@ class EventRouter {
     this.router.patch(
       "/:eventId",
       verifyUser,
+      // validateAccessToken,
       verifySeller,
       blobUploader().single("image"),
       eventController.updateEvent
@@ -38,6 +44,7 @@ class EventRouter {
     this.router.delete(
       "/:eventId",
       verifyUser,
+      // validateAccessToken,
       verifySeller,
       eventController.deleteEvent
     );

@@ -97,24 +97,25 @@ enum Type {
 }
 
 model Event {
-  id           String       @id @default(cuid())
-  user         User         @relation(fields: [user_id], references: [id])
-  user_id      String
-  banner       Bytes        @db.LongBlob
-  title        String
-  description  String       @db.LongText
-  start_time   DateTime
-  end_time     DateTime
-  venue        String
-  city         LocationName
-  location     String
-  category     CategoryName
-  promotor     String
-  type         Type
-  availability Int
-  ticket_price Float?       @db.Double
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id             String       @id @default(cuid())
+  user           User         @relation(fields: [user_id], references: [id])
+  user_id        String
+  banner         Bytes        @db.LongBlob
+  title          String
+  description    String       @db.LongText
+  start_time     DateTime
+  end_time       DateTime
+  venue          String
+  city           LocationName
+  location       String
+  category       CategoryName
+  promotor       String
+  type           Type
+  availability   Int
+  ticket_price   Float?       @db.Double
+  discount_price Float?       @db.Double
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   promo       Promo?
   start_promo DateTime?

@@ -1,11 +1,4 @@
-import {
-  Ticket,
-  Promo,
-  LocationName,
-  CategoryName,
-  Order,
-  Type,
-} from "@prisma/client";
+import { Promo, LocationName, CategoryName, Order, Type } from "@prisma/client";
 
 export type TEvent = {
   id: string;
@@ -23,6 +16,9 @@ export type TEvent = {
   type: Type;
   createdAt: Date;
   updatedAt: Date;
+  ticket_price: number | null;
+  discount_price: number | null;
+  availability: number;
   promo?: Promo | null;
   start_promo?: Date | null;
   end_promo?: Date | null;
