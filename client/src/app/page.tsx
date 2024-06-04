@@ -6,7 +6,7 @@ import EventCategory from "./components/homepage/EventCategory";
 import LocationDropdown from "./components/homepage/events/LocationDropdown";
 import EventSection from "./components/homepage/EventSection";
 import Footer from "./components/Footer";
-import Navbar from "./components/navbar";
+import Navbar from "./components/Navbar";
 
 export default function Home() {
   return (
