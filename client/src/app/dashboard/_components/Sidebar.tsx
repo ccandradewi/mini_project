@@ -16,13 +16,14 @@ const Sidebar = () => {
     window.location.reload();
   };
 
-  const handleCreate = () => {
-    router.push("/dashboard/create");
+  const handleEvent = () => {
+    router.push("/dashboard/my-event");
   };
+
   const loggedinUser = useAppSelector((state) => state.auth) as TUser;
 
   return (
-    <div className="w-64 h-screen bg-zinc-800 text-white flex flex-col justify-between">
+    <div className="w-64 h-screen bg-[#2B2A4C] text-white flex flex-col justify-between">
       <div>
         <div className="flex justify-center items-center p-6">
           <div className="w-[100px]">
@@ -35,13 +36,16 @@ const Sidebar = () => {
         <div className="border-t border-gray-700 mb-6"></div>
         <div className="mb-6">
           <p className="text-xs font-semibold px-6 mb-2">Dashboard</p>
-          <button className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none">
+          <button
+            className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none"
+            onClick={() => router.push("/dashboard")}
+          >
             <FiGrid className="mr-2" /> Dashboard
           </button>
           <button
             className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none
         "
-            onClick={handleCreate}
+            onClick={handleEvent}
           >
             <FiCalendar className="mr-2" /> My Events
           </button>

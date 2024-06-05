@@ -107,7 +107,7 @@ function EventForm() {
         console.log("try creating event", formData);
 
         await axiosInstance().post("/event", formData);
-        router.push("/dashboard");
+        router.push("/dashboard/my-event");
       } catch (error) {
         console.error(error);
         if (error instanceof AxiosError) {
