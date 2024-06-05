@@ -89,10 +89,9 @@ class EventCotroller {
   }
   async deleteEvent(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = await eventService.deleteEvent(req);
+      await eventService.deleteEvent(req);
       return res.send({
         message: "An Event has been deleted",
-        data,
       });
     } catch (error) {
       next(error);

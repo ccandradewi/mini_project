@@ -6,13 +6,9 @@ export const verifySeller = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userId = req.user?.id;
-  if (!userId) {
-    return res.status(401).json({ message: "Unauthorized: No user ID found" });
-  }
   try {
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: req.user?.id },
     });
     if (user?.role !== "seller") {
       return res

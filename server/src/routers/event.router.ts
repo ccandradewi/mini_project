@@ -30,7 +30,7 @@ class EventRouter {
       verifyUser,
       // validateAccessToken,
       verifySeller,
-      blobUploader().single("image"),
+      blobUploader().single("banner"),
       eventController.createEvent
     );
     this.router.patch(
