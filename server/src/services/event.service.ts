@@ -185,6 +185,8 @@ class EventService {
     });
     console.log(createEvent);
     console.log(req);
+    console.log("test");
+
     return createEvent;
   }
   async updateEvent(req: Request) {
@@ -235,6 +237,7 @@ class EventService {
       where: { id: eventId, user_id: req.user?.id },
     });
   }
+
   async renderBanner(req: Request) {
     const data = await prisma.event.findFirst({
       where: {
@@ -243,6 +246,7 @@ class EventService {
     });
     return data?.banner;
   }
+
   async deleteEvent(req: Request) {
     const { eventId } = req.params;
     return await prisma.event.delete({
