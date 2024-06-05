@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import eventService from "../services/event.service";
 
-class EventCotroller {
+class EventController {
   async getAllEvent(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await eventService.getAll(req);
+      console.log("Type of data:", typeof data);
       return res.send({
         message: "All Event",
         data,
@@ -80,8 +81,14 @@ class EventCotroller {
   }
   async renderBanner(req: Request, res: Response, next: NextFunction) {
     try {
+      const { id } = req.params;
       const blob = await eventService.getDetailEvent(req);
-      return res.set("Content-type", "image/png");
+
+      if (!blob) {
+        return res.status(404).send("Banner not found");
+      }
+
+      res.set("Content-Type", "image/png");
       res.send(blob);
     } catch (error) {
       next(error);
@@ -100,4 +107,4 @@ class EventCotroller {
   }
 }
 
-export default new EventCotroller();
+export default new EventController();
