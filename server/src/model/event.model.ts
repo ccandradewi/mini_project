@@ -3,7 +3,7 @@ import { Promo, LocationName, CategoryName, Order, Type } from "@prisma/client";
 export type TEvent = {
   id: string;
   user_id: string;
-  banner: Buffer;
+  banner: Buffer | null;
   title: string;
   description: string;
   start_time: Date;

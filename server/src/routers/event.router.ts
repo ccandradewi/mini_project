@@ -21,14 +21,12 @@ class EventRouter {
     this.router.get(
       "/myEvent",
       verifyUser,
-      // validateAccessToken,
       verifySeller,
       eventController.getBySeller
     );
     this.router.post(
       "/",
       verifyUser,
-      // validateAccessToken,
       verifySeller,
       blobUploader().single("banner"),
       eventController.createEvent
@@ -36,7 +34,6 @@ class EventRouter {
     this.router.patch(
       "/:eventId",
       verifyUser,
-      // validateAccessToken,
       verifySeller,
       blobUploader().single("banner"),
       eventController.updateEvent
@@ -44,7 +41,6 @@ class EventRouter {
     this.router.delete(
       "/:eventId",
       verifyUser,
-      // validateAccessToken,
       verifySeller,
       eventController.deleteEvent
     );
