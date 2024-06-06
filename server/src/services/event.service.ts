@@ -8,6 +8,7 @@ class EventService {
   async getAll(req: Request) {
     const data = await prisma.event.findMany({
       select: {
+        id: true,
         banner: true,
         title: true,
         city: true,
@@ -15,6 +16,8 @@ class EventService {
         end_time: true,
         ticket_price: true,
         discount_price: true,
+        promotor: true,
+        promo: true,
       },
     });
     return data;
@@ -103,6 +106,7 @@ class EventService {
     const data = await prisma.event.findUnique({
       where: { id: eventId },
       select: {
+        id: true,
         banner: true,
         title: true,
         description: true,
@@ -114,6 +118,11 @@ class EventService {
         category: true,
         promotor: true,
         type: true,
+        ticket_price: true,
+        promo: true,
+        discount_price: true,
+        start_promo: true,
+        end_promo: true,
       },
     });
     return data;

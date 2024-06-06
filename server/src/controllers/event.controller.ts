@@ -5,7 +5,7 @@ class EventController {
   async getAllEvent(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await eventService.getAll(req);
-      console.log("Type of data:", typeof data);
+      // console.log("Type of data:", typeof data);
       return res.send({
         message: "All Event",
         data,
