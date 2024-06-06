@@ -24,8 +24,11 @@ const EventCard: React.FC = () => {
 
   const fetchEventData = async () => {
     try {
-      const response = await axiosInstance().get("/event/");
+      const response = await axiosInstance().get("/event");
       const { data } = response.data;
+
+      console.log(data);
+
       const formattedData = data.map((event: any) => ({
         ...event,
         banner: `data:image/jpeg;base64,${Buffer.from(
@@ -47,9 +50,10 @@ const EventCard: React.FC = () => {
     return price.toLocaleString("en-ID");
   };
 
-  const redirectToEvent = (eventId: string) => {
-    router.push(`/event/${eventId}`);
+  const redirectToEvent = (id: string) => {
+    router.push(`/event/${id}`);
   };
+
   return (
     <div className="">
       <div className="flex flex-row flex-wrap gap-6 justify-center">
@@ -73,23 +77,27 @@ const EventCard: React.FC = () => {
                 <div className="text-md">
                   {dayjs(event.start_time).format("DD MMMM YYYY")}
                 </div>{" "}
-                <div className="font-bold">
+                {/* <div className="font-bold">
                   {event.promo && event.discount_price !== undefined
                     ? `IDR ${formatPrice(event.discount_price)}`
                     : event.ticket_price === 0
                     ? "FREE"
                     : `IDR ${formatPrice(event.ticket_price)}`}
-                </div>
-                {/* <div className="font-bold">
+                </div> */}
+                <div className="font-bold">
                   {event.promo && event.discount_price !== undefined ? (
                     <div>
-                      <span className="line-through mr-2">IDR {formatPrice(event.ticket_price)}</span>
+                      <span className="line-through mr-2">
+                        IDR {formatPrice(event.ticket_price)}
+                      </span>
                       <span>IDR {formatPrice(event.discount_price)}</span>
                     </div>
+                  ) : event.ticket_price === 0 ? (
+                    "FREE"
                   ) : (
-                    event.ticket_price === 0 ? "FREE" : `IDR ${formatPrice(event.ticket_price)}`
+                    `IDR ${formatPrice(event.ticket_price)}`
                   )}
-                </div> */}
+                </div>
                 <div className="border my-2" />
                 <div className="flex flex-row  gap-2">
                   <div>{event.promotor}</div>
