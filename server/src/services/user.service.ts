@@ -56,6 +56,36 @@ class UserService {
     return { accessToken, refreshToken, role: data.role };
   }
 
+  async sendingEmail(
+    userId: string,
+    userEmail: string,
+    userFirstName: string,
+    pathToEmailTemplate: string,
+    emailSubject: string,
+    verify_url: string
+  ) {
+    const verifyToken = createToken({ id: userId }, "30m");
+
+    const template = fs
+      .readFileSync(__dirname + pathToEmailTemplate)
+      .toString();
+
+    const html = render(template, {
+      email: userEmail,
+      first_name: userFirstName,
+      verify_url: `http://localhost:3000/${verify_url}/${verifyToken}`,
+    });
+    let returnFromTransporter = await transporter
+      .sendMail({
+        to: userEmail,
+        subject: emailSubject,
+        html,
+      })
+      .then((info) => "Email sent successfully")
+      .catch((error) => error.message);
+    return returnFromTransporter;
+  }
+
   async userRegister(req: Request) {
     console.log("masuk di function ini");
     const {
@@ -172,25 +202,15 @@ class UserService {
         },
       });
 
-    const verifyToken = createToken({ id: newUser.id }, "30m");
-
-    const template = fs
-      .readFileSync(__dirname + "/../templates/verification.html")
-      .toString();
-
-    const html = render(template, {
-      email: data.email,
-      first_name: data.first_name,
-      verify_url: `http://localhost:3000/verify/${verifyToken}`,
-    });
-
-    console.log("rendering template");
-
-    transporter.sendMail({
-      to: data.email,
-      subject: "Welcome To Tickzy, Please Verify Your Email Address",
-      html,
-    });
+    let sentEmail = this.sendingEmail(
+      newUser.id,
+      data.email,
+      data.first_name,
+      "/../templates/verification.html",
+      "Welcome To Tickzy, Please Verify Your Email Address",
+      "verify"
+    );
+    return `New user has been registered to our database, and ${sentEmail}`;
   }
 
   async sendVerification(req: Request) {
@@ -240,6 +260,38 @@ class UserService {
     const access_token = createToken(data, "1hr");
 
     return { access_token, isVerified: data?.isVerified };
+  }
+  async resendVerification(req: Request) {
+    try {
+      const { email } = req.body;
+      const select: Prisma.UserSelectScalar = {
+        id: true,
+        first_name: true,
+        isVerified: true,
+      };
+      const data = await prisma.user.findUnique({
+        select,
+        where: { email: email },
+      });
+      if (!data) {
+        return "user not found";
+      }
+      if (data.isVerified) {
+        return "You have previously verified your email";
+      } else {
+        let message = await this.sendingEmail(
+          data.id,
+          email,
+          data?.first_name,
+          "/../templates/verification.html",
+          "Welcome To Tickzy, Please Verify Your Email Address",
+          "verify"
+        );
+        return message;
+      }
+    } catch (error) {
+      console.log("error resend email");
+    }
   }
 }
 

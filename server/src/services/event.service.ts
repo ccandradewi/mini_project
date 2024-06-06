@@ -6,7 +6,17 @@ import sharp from "sharp";
 
 class EventService {
   async getAll(req: Request) {
-    const data = await prisma.event.findMany();
+    const data = await prisma.event.findMany({
+      select: {
+        banner: true,
+        title: true,
+        city: true,
+        start_time: true,
+        end_time: true,
+        ticket_price: true,
+        discount_price: true,
+      },
+    });
     return data;
   }
 
