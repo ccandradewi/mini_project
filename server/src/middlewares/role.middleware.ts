@@ -48,3 +48,29 @@ export const verifyBuyer = async (
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const verifyEventOwner = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { eventId } = req.params;
+
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { user_id: true }, // Hanya ambil ID pemilik acara
+    });
+
+    if (event && event.user_id === req.user?.id) {
+      next();
+    } else {
+      res
+        .status(403)
+        .json({ error: "Access denied. You are not the owner of this event." });
+    }
+  } catch (error) {
+    console.error("Error verifying event owner:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
