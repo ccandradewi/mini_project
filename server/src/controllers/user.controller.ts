@@ -53,6 +53,16 @@ class UserController {
       next(error);
     }
   }
+  async resendEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      let response = await userService.resendVerification(req);
+      res.status(201).send({
+        message: response,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async validateUser(req: Request, res: Response, next: NextFunction) {
     try {
