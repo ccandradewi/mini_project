@@ -10,12 +10,13 @@ export const userSlice = createSlice({
   reducers: {
     login: (state, action: PayloadAction<TUser>) => {
       state = { ...state, ...action.payload };
+      console.log(state);
+
       return state;
     },
     logout: (state) => {
       deleteCookie("access_token");
       deleteCookie("refresh_token");
-
       state = initialUser;
 
       return state;

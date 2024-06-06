@@ -1,18 +1,22 @@
-"use client";
 import React from "react";
 import { AppProps } from "next/app";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-// const MyApp = ({ Component, pageProps }: AppProps) => {
-//   return (
-//     <>
-//       <h1>hello</h1>
-//     </>
-//   );
-// };
-
-// export default MyApp;
+import EventHero from "./components/homepage/EventHero";
+import EventCategory from "./components/homepage/EventCategory";
+import LocationDropdown from "./components/homepage/events/LocationDropdown";
+import EventSection from "./components/homepage/EventSection";
+import Footer from "./components/Footer";
+import Navbar from "./components/Navbar";
 
 export default function Home() {
-  return <h1>home</h1>;
+  return (
+    <div>
+      <Navbar />
+      <EventHero />
+      <EventCategory />
+      {/* <LocationDropdown /> */}
+      <EventSection />
+      <Footer />
+    </div>
+  );
 }

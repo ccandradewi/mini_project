@@ -1,0 +1,20 @@
+export type TEvent = {
+  id?: string;
+  user_id?: string;
+  banner?: File | null;
+  title?: string;
+  description?: string;
+  start_time?: Date | string;
+  end_time?: Date | string;
+  venue?: string;
+  city?: string;
+  location?: string;
+  category?: string;
+  promotor?: string;
+  type?: "FREE" | "PAID";
+  availability?: number;
+  ticket_price?: number;
+  promo?: "TEN_PERCENT" | "TWENTY_FIVE_PERCENT" | "FIFTY_PERCENT" | "";
+  start_promo?: Date | string;
+  end_promo?: Date | string;
+};
