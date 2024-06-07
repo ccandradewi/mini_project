@@ -4,7 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { IoLocationOutline, IoCalendarOutline } from "react-icons/io5";
-import TicketCard from "@/app/event/[id]/_components/TicketCard";
+import { FiEdit } from "react-icons/fi";
+import { MdDeleteOutline } from "react-icons/md";
+import { imageSrc } from "@/utils/image.render";
 
 interface Event {
   id: string;
@@ -40,14 +42,8 @@ function DashboardEventDetail() {
         );
 
         const { data } = response.data;
-        const formattedData = {
-          ...data,
-          banner: `data:image/jpeg;base64,${Buffer.from(
-            data.banner,
-            "binary"
-          ).toString("base64")}`,
-        };
-        setEvent(formattedData);
+
+        setEvent(data);
         // setEvent(data);
         console.log(data);
 
@@ -61,6 +57,17 @@ function DashboardEventDetail() {
 
     fetchEventData();
   }, []);
+
+  const handleDeleteEvent = async () => {
+    if (confirm("Are you sure you want to delete this event?")) {
+      try {
+        await axiosInstance().delete(`/event/${id}`);
+        router.push("/dashboard/my-event");
+      } catch (error) {
+        console.error("Error deleting event", error);
+      }
+    }
+  };
 
   return (
     <>
@@ -82,10 +89,10 @@ function DashboardEventDetail() {
           </div>
 
           {/* BANNER */}
-          <div className="flex flex-row">
+          <div className="">
             <div className="w-full h-80 px-4 relative">
               <img
-                src={event?.banner}
+                src={`${imageSrc}${event?.id}`}
                 alt="Event Banner"
                 className="object-cover w-full h-full rounded-xl"
               />
@@ -116,6 +123,22 @@ function DashboardEventDetail() {
               </div>
 
               <div className="text-justify">{event?.description}</div>
+            </div>
+
+            <div className="flex flex-col gap-4 p-4 items-center">
+              <button
+                className="bg-[#EA906C] w-40 px-4 py-2 rounded-full shadow-md font-semibold flex flex-row items-center gap-2 hover:bg-[#EEE2DE] duration-100 text-sm"
+                onClick={() => router.push(`/dashboard/my-event/edit/${id}`)}
+              >
+                <FiEdit /> Edit event
+              </button>
+
+              <button
+                className="bg-[#B31312] w-40 px-4 py-2 rounded-full shadow-md font-semibold flex flex-row items-center gap-2 hover:bg-[#EEE2DE] duration-100 text-white text-sm"
+                onClick={handleDeleteEvent}
+              >
+                <MdDeleteOutline /> Delete event
+              </button>
             </div>
           </div>
         </div>
