@@ -62,8 +62,12 @@ function EventForm() {
         .required("Promotor is required")
         .min(3, "Promotor must be at least 3 characters"),
       type: Yup.string().oneOf(["PAID", "FREE"]).required("Type is required"),
-      availability: Yup.number().required("Availability is required"),
-      ticket_price: Yup.number().required("Ticket price is required"),
+      availability: Yup.number()
+        .required("Availability is required")
+        .typeError("Amount must be a number"),
+      ticket_price: Yup.number()
+        .required("Ticket price is required")
+        .typeError("Amount must be a number"),
       promo: Yup.string().oneOf([
         "TEN_PERCENT",
         "TWENTY_FIVE_PERCENT",
@@ -378,7 +382,7 @@ function EventForm() {
                 Ticket stock
               </label>
               <input
-                type="number"
+                type="text"
                 name="availability"
                 placeholder="Ticket stock*"
                 className="input input-bordered w-full max-w-xs"
@@ -398,7 +402,7 @@ function EventForm() {
                 Price
               </label>
               <input
-                type="number"
+                type="text"
                 name="ticket_price"
                 placeholder="Ticket price"
                 className="input input-bordered w-full max-w-xs"
@@ -444,6 +448,7 @@ function EventForm() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.promo}
+              disabled={formik.values.type === "FREE"}
             >
               <option value="">Select Promo (optional)</option>
               <option value="TEN_PERCENT">10% off</option>
@@ -467,6 +472,7 @@ function EventForm() {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.start_promo}
+                disabled={formik.values.type === "FREE"}
               />
               {formik.errors.start_promo && formik.touched.start_promo && (
                 <div className="text-red-600 text-xs">
@@ -485,6 +491,7 @@ function EventForm() {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.end_promo}
+                disabled={formik.values.type === "FREE"}
               />
               {formik.errors.end_promo && formik.touched.end_promo && (
                 <div className="text-red-600 text-xs">
