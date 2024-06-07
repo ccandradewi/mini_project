@@ -18,3 +18,25 @@ export type TEvent = {
   start_promo?: Date | string;
   end_promo?: Date | string;
 };
+
+export interface Event {
+  id: string;
+  user_id: string;
+  banner: string;
+  title: string;
+  description: string;
+  city: string;
+  location: string;
+  type: string;
+  category: string;
+  start_time: string;
+  end_time: string;
+  ticket_price: number;
+  availability: string;
+  promo: string;
+  start_promo: string;
+  end_promo: string;
+  createdAt: string;
+  updatedAt: string;
+  venue: string;
+}
