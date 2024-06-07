@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { axiosInstance } from "@/lib/axios.config";
 import dayjs from "dayjs";
+import { imageSrc } from "@/utils/image.render";
 
 interface Event {
   id: string;
@@ -23,6 +24,7 @@ interface Event {
   createdAt: string;
   updatedAt: string;
   venue: string;
+  discount_price: number;
 }
 
 function MyEventCard() {
@@ -38,22 +40,21 @@ function MyEventCard() {
     try {
       const response = await axiosInstance().get("/event/myEvent");
       const { data } = response.data;
-      const formattedData = data.map((event: any) => ({
-        ...event,
-        banner: `data:image/jpeg;base64,${Buffer.from(
-          event.banner,
-          "binary"
-        ).toString("base64")}`,
-      }));
-      setEvents(formattedData);
+
+      setEvents(data);
     } catch (error) {
       console.error("Error fetching event data:", error);
     }
   };
 
+  const formatPrice = (price: number) => {
+    return price.toLocaleString("en-ID");
+  };
+
   useEffect(() => {
     fetchEventData();
   }, []);
+
   return (
     <>
       <div className="py-10 px-6">
@@ -78,10 +79,20 @@ function MyEventCard() {
                   </div>
 
                   <div className="font-bold">
-                    {event.ticket_price === 0
-                      ? "FREE"
-                      : `IDR ${event.ticket_price.toLocaleString()}`}
+                    {event.promo && event.discount_price !== undefined ? (
+                      <div>
+                        <span className="line-through mr-2">
+                          IDR {formatPrice(event.ticket_price)}
+                        </span>
+                        <span>IDR {formatPrice(event.discount_price)}</span>
+                      </div>
+                    ) : event.ticket_price === 0 ? (
+                      "FREE"
+                    ) : (
+                      `IDR ${formatPrice(event.ticket_price)}`
+                    )}
                   </div>
+
                   {event.promo && (
                     <div className="text-sm">
                       Promo period:
@@ -107,7 +118,7 @@ function MyEventCard() {
 
                 <div className="w-[400px] h-60 relative p-3">
                   <img
-                    src={event.banner}
+                    src={`${imageSrc}${event.id}`}
                     alt="Event Banner"
                     className="object-cover w-full h-full rounded-xl"
                   />
