@@ -1,8 +1,12 @@
 import React from "react";
-import VerifyRegis from "./_component/VerifyRegis";
+import ResendEmailVerif from "./_component/ResendEmailVerif";
 
 function VerifyPage() {
-  return <VerifyRegis />;
+  return (
+    <>
+      <ResendEmailVerif />;
+    </>
+  );
 }
 
 export default VerifyPage;

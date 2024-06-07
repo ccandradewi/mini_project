@@ -16,6 +16,8 @@ class UserRouter {
     this.router.get("/v3", verifyUser, userController.validateUser);
     this.router.get("/verification/:token", userController.sendVerif);
     this.router.post("/resendVerificationEmail", userController.resendEmail);
+    this.router.post("/sendChangePassword", userController.sendChangePassword);
+    this.router.post("/verifyChangePassword", userController.verifyChangePass);
   }
 
   getRouter() {

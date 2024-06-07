@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { AxiosError } from "axios";
 import { userLogin } from "@/lib/redux/middleware/auth.middleware";
 import { useLoading } from "@/utils/hooks";
+import Link from "next/link";
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -99,6 +100,12 @@ const LoginForm: React.FC = () => {
                 <div className="text-danger">{formik.errors.password}</div>
               ) : null}
             </div>
+            <Link
+              href="/auth/passwordreset"
+              className="link-primary text-decoration-none"
+            >
+              Forgot password?
+            </Link>
             <button
               type="submit"
               className="btn my-4 btn-neutral"
@@ -107,7 +114,7 @@ const LoginForm: React.FC = () => {
               Sign In
             </button>
             <p className="py-4">
-              Don't have an account?{" "}
+              {"Don't have an account? "}
               <a href="/auth/register" className="text-black">
                 {" "}
                 Register here.

@@ -21,8 +21,8 @@ class UserController {
 
       if (role && role === "seller") {
         res
-          .cookie("access_token", accessToken, { httpOnly: true })
-          .cookie("refresh_token", refreshToken, { httpOnly: true })
+          .cookie("access_token", accessToken)
+          .cookie("refresh_token", refreshToken)
           .send({
             message: "Login as seller",
             role: "seller",
@@ -49,6 +49,29 @@ class UserController {
     try {
       await userService.sendVerification(req);
       res.send({ message: "verification success" });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async sendChangePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      let result = await userService.sendChangePasswordLink(req);
+      if (result) {
+        res.status(200).send({ message: result });
+      } else {
+        res.status(400).send({
+          message:
+            "Your email is not registered in our database, please do register first.",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+  async verifyChangePass(req: Request, res: Response, next: NextFunction) {
+    try {
+      let result = await userService.verifyChangePass(req);
+      res.status(200).send({ message: result });
     } catch (error) {
       next(error);
     }

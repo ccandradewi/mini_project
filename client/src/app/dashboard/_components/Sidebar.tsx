@@ -10,12 +10,15 @@ const Sidebar = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const handleLogout = () => {
-    dispatch(logout());
+  // const handleLogout = () => {
+  //   dispatch(logout());
+  //   router.push("/");
+  //   window.location.reload();
+  // };
+  const onLogoutHandle = async () => {
+    await dispatch(logout());
     router.push("/");
-    window.location.reload();
   };
-
   const handleEvent = () => {
     router.push("/dashboard/my-event");
   };
@@ -61,7 +64,7 @@ const Sidebar = () => {
           <button
             className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none
       "
-            onClick={handleLogout}
+            onClick={onLogoutHandle}
           >
             <FiLogOut className="mr-2" /> Sign Out
           </button>

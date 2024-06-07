@@ -44,7 +44,12 @@ export async function middleware(request: NextRequest) {
 
   const validate = res ? true : false;
   console.log(res, validate, is_verified);
-
+  if (!token) {
+    if (pathname.startsWith("/dashboard")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return response;
+  }
   if (pathname == "/" && validate && is_verified && !isBuyer) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } else if (pathname == "/dashboard" && !validate) {

@@ -6,7 +6,7 @@ import { deleteCookie } from "cookies-next";
 
 export const userSlice = createSlice({
   name: "auth",
-  initialState: initialUser as TUser,
+  initialState: initialUser as TUser | null,
   reducers: {
     login: (state, action: PayloadAction<TUser>) => {
       state = { ...state, ...action.payload };
