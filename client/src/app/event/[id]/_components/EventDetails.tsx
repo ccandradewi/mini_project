@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { IoLocationOutline, IoCalendarOutline } from "react-icons/io5";
 import TicketCard from "./TicketCard";
+import { imageSrc } from "@/utils/image.render";
 
 interface Event {
   id: string;
@@ -38,14 +39,8 @@ function EventDetails() {
         const response = await axiosInstance().get(`/event/detail/${id}`);
 
         const { data } = response.data;
-        const formattedData = {
-          ...data,
-          banner: `data:image/jpeg;base64,${Buffer.from(
-            data.banner,
-            "binary"
-          ).toString("base64")}`,
-        };
-        setEvent(formattedData);
+
+        setEvent(data);
         // setEvent(data);
         console.log(data);
 
@@ -80,7 +75,7 @@ function EventDetails() {
           <div className="flex flex-row">
             <div className="w-full h-80 px-4 relative">
               <img
-                src={event?.banner}
+                src={`${imageSrc}${event?.id}`}
                 alt="Event Banner"
                 className="object-cover w-full h-full rounded-xl"
               />
