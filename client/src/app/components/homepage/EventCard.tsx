@@ -3,6 +3,7 @@ import { axiosInstance } from "@/lib/axios.config";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
+import { imageSrc } from "@/utils/image.render";
 
 interface Event {
   id: string;
@@ -29,14 +30,7 @@ const EventCard: React.FC = () => {
 
       console.log(data);
 
-      const formattedData = data.map((event: any) => ({
-        ...event,
-        banner: `data:image/jpeg;base64,${Buffer.from(
-          event.banner,
-          "binary"
-        ).toString("base64")}`,
-      }));
-      setEvents(formattedData);
+      setEvents(data);
     } catch (error) {
       console.error("Error fetching event data:", error);
     }
@@ -66,7 +60,7 @@ const EventCard: React.FC = () => {
             >
               <div className="h-32 relative">
                 <img
-                  src={event.banner}
+                  src={`${imageSrc}${event.id}`}
                   alt=""
                   className="object-cover w-full h-full"
                   // onLoad={handleImageLoad} // Cleanup temporary URL on load
