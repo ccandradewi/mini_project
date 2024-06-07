@@ -81,8 +81,7 @@ class EventController {
   }
   async renderBanner(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const blob = await eventService.getDetailEvent(req);
+      const blob = await eventService.renderBanner(req);
 
       if (!blob) {
         return res.status(404).send("Banner not found");
