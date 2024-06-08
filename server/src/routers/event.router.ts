@@ -24,7 +24,7 @@ class EventRouter {
       eventController.getEventDetail
     );
     this.router.get("/title", eventController.getEventTitle);
-    this.router.get("/filter", eventController.filterEvent);
+    this.router.get("/f", eventController.filterEvent);
     this.router.get(
       "/myEvent",
       verifyUser,
