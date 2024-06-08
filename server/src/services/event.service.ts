@@ -18,6 +18,7 @@ class EventService {
         discount_price: true,
         promotor: true,
         promo: true,
+        venue: true,
       },
     });
     return data;
@@ -81,25 +82,31 @@ class EventService {
   async getByfilter(req: Request) {
     const { city, category } = req.query;
     let filter: any = {};
+
     if (city && typeof city === "string") {
-      filter.city = city as LocationName;
+      filter.city = city;
     }
     if (category && typeof category === "string") {
-      filter.category = category as CategoryName;
+      filter.category = category;
     }
+
     const data = await prisma.event.findMany({
       where: filter,
       select: {
+        id: true,
         title: true,
         start_time: true,
         ticket_price: true,
+        discount_price: true,
         location: true,
         category: true,
         banner: true,
+        venue: true,
+        city: true,
         promotor: true,
       },
     });
-    if (!data) throw new Error("Event Not Found");
+
     return data;
   }
   async getDetailEvent(req: Request) {
