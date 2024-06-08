@@ -6,7 +6,7 @@ import Sidebar from "./_components/Sidebar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Tickzy",
+  title: "Tickzy | Dashboard",
 };
 
 export default function DashboardLayout({
