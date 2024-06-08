@@ -1,4 +1,4 @@
-export const locations = [
+export const city = [
   { name: "JABODETABEK", displayName: "Jabodetabek" },
   { name: "JAWA", displayName: "Jawa" },
   { name: "SUMATRA", displayName: "Sumatra" },
