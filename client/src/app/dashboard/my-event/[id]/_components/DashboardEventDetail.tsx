@@ -7,6 +7,7 @@ import { IoLocationOutline, IoCalendarOutline } from "react-icons/io5";
 import { FiEdit } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
 import { imageSrc } from "@/utils/image.render";
+import Swal from "sweetalert2";
 
 interface Event {
   id: string;
@@ -58,15 +59,51 @@ function DashboardEventDetail() {
     fetchEventData();
   }, []);
 
+  const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: "btn btn-success",
+      cancelButton: "btn btn-danger",
+    },
+    buttonsStyling: false,
+  });
+
   const handleDeleteEvent = async () => {
-    if (confirm("Are you sure you want to delete this event?")) {
-      try {
-        await axiosInstance().delete(`/event/${id}`);
-        router.push("/dashboard/my-event");
-      } catch (error) {
-        console.error("Error deleting event", error);
-      }
-    }
+    swalWithBootstrapButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "No, cancel",
+        confirmButtonText: "Yes, delete!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            await axiosInstance().delete(`/event/${id}`);
+            await swalWithBootstrapButtons.fire({
+              title: "Deleted!",
+              text: "Your event has been deleted.",
+              icon: "success",
+            });
+            router.push("/dashboard/my-event");
+          } catch (error) {
+            console.error("Error deleting event", error);
+            await swalWithBootstrapButtons.fire({
+              title: "Error",
+              text: "An error occurred while deleting the event",
+              icon: "error",
+            });
+          }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire({
+            title: "Cancelled",
+            text: "Your event is safe :)",
+            icon: "error",
+          });
+        }
+      });
   };
 
   return (
@@ -128,7 +165,7 @@ function DashboardEventDetail() {
             <div className="flex flex-col gap-4 p-4 items-center">
               <button
                 className="bg-[#EA906C] w-40 px-4 py-2 rounded-full shadow-md font-semibold flex flex-row items-center gap-2 hover:bg-[#EEE2DE] duration-100 text-sm"
-                onClick={() => router.push(`/dashboard/my-event/edit/${id}`)}
+                onClick={() => router.push(`/dashboard/edit/${id}`)}
               >
                 <FiEdit /> Edit event
               </button>

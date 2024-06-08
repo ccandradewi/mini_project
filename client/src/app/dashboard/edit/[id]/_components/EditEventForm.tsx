@@ -1,93 +1,97 @@
 "use client";
 import { axiosInstance } from "@/lib/axios.config";
-import { TEvent } from "@/models/event.model";
 import { AxiosError } from "axios";
 import { useFormik } from "formik";
-import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
+import { useRouter, useParams } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
+import { imageSrc } from "@/utils/image.render";
 import Swal from "sweetalert2";
 
-function EventForm() {
-  const router = useRouter();
+interface EventData {
+  id: string;
+  banner: string | null;
+  title: string;
+  description: string;
+  venue: string;
+  city: string;
+  start_time: string;
+  end_time: string;
+  location: string;
+  category: string;
+  promotor: string;
+  type: string;
+  availability: number;
+  ticket_price: number;
+  promo: string;
+  start_promo: string;
+  end_promo: string;
+}
 
-  const initialValues = {
-    banner: null,
-    title: "",
-    description: "",
-    venue: "",
-    city: "",
-    start_time: "",
-    end_time: "",
-    location: "",
-    category: "",
-    promotor: "",
-    type: "",
-    availability: 0,
-    ticket_price: 0,
-    promo: "",
-    start_promo: "",
-    end_promo: "",
-  };
+function EditEventForm() {
+  const router = useRouter();
+  const { id } = useParams();
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      banner: "",
+      title: "", // Default value for title
+      description: "",
+      venue: "",
+      city: "",
+      start_time: "",
+      end_time: "",
+      location: "",
+      category: "",
+      promotor: "",
+      type: "",
+      availability: 0,
+      ticket_price: 0,
+      promo: "",
+      start_promo: "",
+      end_promo: "",
+    },
     validationSchema: Yup.object().shape({
-      banner: Yup.mixed().required("Banner is required"),
-      title: Yup.string()
-        .required("Title is required")
-        .min(5, "Title must be at least 5 characters"),
-      description: Yup.string(),
-      venue: Yup.string()
-        .required("Venue is required")
-        .min(5, "Venue must be at least 5 characters"),
+      title: Yup.string().required("Title is required"),
+      description: Yup.string().required("Description is required"),
+      venue: Yup.string().required("Venue is required"),
+      city: Yup.string().required("City is required"),
+      start_time: Yup.date().required("Start time is required"),
+      end_time: Yup.date()
+        .required("End time is required")
+        .min(Yup.ref("start_time"), "End time must be after start time"),
       location: Yup.string().required("Location is required"),
-      start_time: Yup.date().required("Start date is required"),
-      end_time: Yup.date().required("End date is required"),
-      city: Yup.string()
-        .oneOf([
-          "JABODETABEK",
-          "JAWA",
-          "SUMATRA",
-          "KALIMANTAN",
-          "SULAWESI",
-          "BALI_NUSA_TENGGARA",
-          "PAPUA_MALUKU",
-        ])
-        .required("City is required"),
       category: Yup.string()
         .oneOf(["MUSIC", "SPORTS", "EXHIBITION", "CONFERENCE", "THEATRE"])
         .required("Category is required"),
       promotor: Yup.string()
         .required("Promotor is required")
         .min(3, "Promotor must be at least 3 characters"),
-      type: Yup.string().oneOf(["PAID", "FREE"]).required("Type is required"),
+      //   type: Yup.string().oneOf(["PAID", "FREE"]).required("Type is required"),
       availability: Yup.number()
         .required("Availability is required")
         .typeError("Amount must be a number"),
       ticket_price: Yup.number()
         .required("Ticket price is required")
         .typeError("Amount must be a number"),
-      promo: Yup.string().oneOf([
-        "TEN_PERCENT",
-        "TWENTY_FIVE_PERCENT",
-        "FIFTY_PERCENT",
-      ]),
-      start_promo: Yup.date(),
-      end_promo: Yup.date(),
+      promo: Yup.string()
+        .oneOf(["TEN_PERCENT", "TWENTY_FIVE_PERCENT", "FIFTY_PERCENT"])
+        .nullable(),
+      start_promo: Yup.date().nullable(),
+      end_promo: Yup.date().nullable(),
     }),
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       try {
+        console.log("Form values:", values);
+
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("description", values.description);
         formData.append("venue", values.venue);
         formData.append("city", values.city);
-        formData.append(
-          "start_time",
-          new Date(values.start_time).toISOString()
-        );
-        formData.append("end_time", new Date(values.end_time).toISOString());
+        formData.append("start_time", values.start_time);
+        formData.append("end_time", values.end_time);
         formData.append("location", values.location);
         formData.append("category", values.category);
         formData.append("promotor", values.promotor);
@@ -100,45 +104,87 @@ function EventForm() {
 
         if (values.promo) {
           formData.append("promo", values.promo);
-          formData.append(
-            "start_promo",
-            new Date(values.start_promo).toISOString()
-          );
-          formData.append(
-            "end_promo",
-            new Date(values.end_promo).toISOString()
-          );
+          formData.append("start_promo", values.start_promo);
+          formData.append("end_promo", values.end_promo);
         }
 
         if (values.banner) {
           formData.append("banner", values.banner);
         }
 
-        await axiosInstance().post("/event", formData);
-        resetForm();
-        Swal.fire(
-          "Event Created!",
-          "Your event has been created successfully.",
-          "success"
-        );
+        formData.forEach((value, key) => {
+          console.log(`${key}: ${value}`);
+        });
+
+        await axiosInstance().patch(`/event/${id}`, formData);
         router.push("/dashboard/my-event");
       } catch (error) {
-        console.error(error);
+        console.error("Error updating event:", error);
         if (error instanceof AxiosError) {
-          Swal.fire("Error", error.response?.data.message, "error");
+          alert(error.response?.data.message);
         }
       }
     },
   });
 
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const response = await axiosInstance().get(`/event/detail/${id}`);
+        const event = response.data.data;
+        console.log("Fetched event data:", event);
+
+        const imgSrc = `http://localhost:8000/event/image/${event.id}`;
+
+        if (event.id) {
+          formik.setValues({
+            banner: imgSrc,
+            title: event.title,
+            description: event.description,
+            venue: event.venue,
+            city: event.city,
+            start_time: event.start_time,
+            end_time: event.end_time,
+            location: event.location,
+            category: event.category,
+            promotor: event.promotor,
+            type: event.type,
+            availability: event.availability,
+            ticket_price: event.ticket_price,
+            promo: event.promo || "",
+            start_promo: event.start_promo || "",
+            end_promo: event.end_promo || "",
+          });
+        }
+        setImagePreview(imgSrc);
+        console.log(event.banner);
+      } catch (error) {
+        console.error("Error fetching event data:", error);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
   const imageRef = useRef<HTMLInputElement>(null);
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.currentTarget.files && e.currentTarget.files[0];
+    if (file) {
+      formik.setFieldValue("banner", file);
+
+      const tempUrl = URL.createObjectURL(file);
+
+      setImagePreview(tempUrl);
+    }
+  };
+
+  const handleEditFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     Swal.fire({
-      title: "Are you sure you want to submit the form?",
+      title: "Are you sure you want to update the form?",
       showCancelButton: true,
-      confirmButtonText: "Yes, submit",
+      confirmButtonText: "Yes, update",
       cancelButtonText: `No, cancel`,
     }).then((result) => {
       if (result.isConfirmed) {
@@ -152,40 +198,31 @@ function EventForm() {
   return (
     <div className="h-screen">
       <div className="flex flex-col px-4 items-center justify-center py-6">
-        <h2 className="text-lg font-bold">Create an Event</h2>
-
-        <form className="w-1/2" onSubmit={handleFormSubmit}>
+        <h2 className="text-lg font-bold">Edit Event</h2>
+        <form className="w-1/2" onSubmit={handleEditFormSubmit}>
           <div className="pb-2">
             {formik.errors.banner && (
               <div className="text-red-600 text-xs">{formik.errors.banner}</div>
             )}
             <img
-              src={
-                formik.values.banner
-                  ? URL.createObjectURL(formik.values.banner)
-                  : "https://assets.loket.com/images/banner-event.jpg"
-              }
-              alt=""
+              src={imagePreview}
+              alt="event banner"
               className="rounded-xl w-full"
               onClick={() => imageRef.current?.click()}
             />
           </div>
-
           <div>
             <input
               type="file"
               ref={imageRef}
               hidden
               accept="image/*"
-              onChange={(e) => {
-                if (e.currentTarget.files) {
-                  formik.setFieldValue("banner", e.currentTarget.files[0]);
-                }
-              }}
+              onChange={handleFileChange}
             />
           </div>
-
+          {/* Title and Venue */}
           <div className="flex flex-row gap-6">
+            {/* Title */}
             <div className="flex flex-col w-full">
               <input
                 type="text"
@@ -203,6 +240,7 @@ function EventForm() {
               )}
             </div>
 
+            {/* Venue */}
             <div className="flex flex-col w-full">
               <input
                 type="text"
@@ -220,7 +258,7 @@ function EventForm() {
               )}
             </div>
           </div>
-
+          {/* Category Field */}
           <div className="flex flex-row gap-4">
             <div className="pt-3 w-full">
               <select
@@ -246,7 +284,7 @@ function EventForm() {
               )}
             </div>
           </div>
-
+          {/* City Field */}
           <div className="pt-3 w-full">
             <select
               name="city"
@@ -258,19 +296,19 @@ function EventForm() {
               <option value="" disabled>
                 Area*
               </option>
-              <option value="JABODETABEK">Jabodetabek</option>
-              <option value="JAWA">Pulau Jawa</option>
-              <option value="SUMATRA">Pulau Sumatra</option>
-              <option value="KALIMANTAN">Pulau Kalimantan</option>
-              <option value="SULAWESI">Pulau Sulawesi</option>
-              <option value="BALI_NUSA_TENGGARA">Bali dan Nusa Tenggara</option>
-              <option value="PAPUA_MALUKU">Papua dan Maluku</option>
+              <option value="JABODETABEK">JABODETABEK</option>
+              <option value="JAWA">JAWA</option>
+              <option value="SUMATRA">SUMATRA</option>
+              <option value="KALIMANTAN">KALIMANTAN</option>
+              <option value="SULAWESI">SULAWESI</option>
+              <option value="BALI_NUSA_TENGGARA">BALI_NUSA_TENGGARA</option>
+              <option value="PAPUA_MALUKU">PAPUA_MALUKU</option>
             </select>
             {formik.errors.city && formik.touched.city && (
               <div className="text-red-600 text-xs">{formik.errors.city}</div>
             )}
           </div>
-
+          {/* Promotor and Location Fields */}
           <div className="flex flex-row pt-3  gap-6">
             <div className="flex flex-col w-1/2">
               <span className="text-sm pb-1">Organized by</span>
@@ -308,7 +346,7 @@ function EventForm() {
               )}
             </div>
           </div>
-
+          {/* Date Fields */}
           <div className="flex flex-row gap-6 pt-2">
             <div className="flex flex-col w-[320px]">
               <label htmlFor="start_time" className="py-2 text-sm">
@@ -364,7 +402,7 @@ function EventForm() {
               </div>
             </div>
           </div>
-
+          {/* Event Type */}{" "}
           <div className="flex flex-row gap-6 pt-2">
             <div className="flex flex-col w-full">
               <label htmlFor="type" className="py-3 text-sm">
@@ -377,7 +415,9 @@ function EventForm() {
                     name="type"
                     value="FREE"
                     className="radio radio-primary"
-                    onChange={formik.handleChange}
+                    onChange={(e) =>
+                      formik.setFieldValue("type", e.target.value)
+                    }
                     onBlur={formik.handleBlur}
                     checked={formik.values.type === "FREE"}
                   />
@@ -389,7 +429,9 @@ function EventForm() {
                     name="type"
                     value="PAID"
                     className="radio radio-primary"
-                    onChange={formik.handleChange}
+                    onChange={(e) =>
+                      formik.setFieldValue("type", e.target.value)
+                    }
                     onBlur={formik.handleBlur}
                     checked={formik.values.type === "PAID"}
                   />
@@ -401,14 +443,14 @@ function EventForm() {
               )}
             </div>
           </div>
-
+          {/* Ticket Availability and Price */}
           <div className="flex flex-row gap-6 py-3">
             <div className="flex flex-col w-full">
               <label htmlFor="availability" className="text-sm py-2">
                 Ticket stock
               </label>
               <input
-                type="text"
+                type="number"
                 name="availability"
                 placeholder="Ticket stock*"
                 className="input input-bordered w-full max-w-xs"
@@ -428,7 +470,7 @@ function EventForm() {
                 Price
               </label>
               <input
-                type="text"
+                type="number"
                 name="ticket_price"
                 placeholder="Ticket price"
                 className="input input-bordered w-full max-w-xs"
@@ -444,7 +486,7 @@ function EventForm() {
               )}
             </div>
           </div>
-
+          {/* Event Description */}
           <div className="flex flex-col w-full">
             <label htmlFor="description" className="text-sm pb-1">
               Event description
@@ -463,7 +505,7 @@ function EventForm() {
               </div>
             )}
           </div>
-
+          {/* Promo */}
           <div className="flex flex-col w-full">
             <label htmlFor="promo" className="text-sm py-2">
               Promo
@@ -485,7 +527,7 @@ function EventForm() {
               <div className="text-red-600 text-xs">{formik.errors.promo}</div>
             )}
           </div>
-
+          {/* Promo Date Fields */}
           <div className="flex flex-row gap-6 pt-2">
             <div className="flex flex-col w-full">
               <label htmlFor="start_promo" className="py-3 text-sm">
@@ -497,8 +539,14 @@ function EventForm() {
                 className="input input-bordered w-full max-w-xs"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.start_promo}
                 disabled={formik.values.type === "FREE"}
+                value={
+                  formik.values.start_promo
+                    ? new Date(formik.values.start_promo)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
               />
               {formik.errors.start_promo && formik.touched.start_promo && (
                 <div className="text-red-600 text-xs">
@@ -514,10 +562,16 @@ function EventForm() {
                 type="date"
                 name="end_promo"
                 className="input input-bordered w-full max-w-xs"
+                disabled={formik.values.type === "FREE"}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                value={formik.values.end_promo}
-                disabled={formik.values.type === "FREE"}
+                value={
+                  formik.values.end_promo
+                    ? new Date(formik.values.end_promo)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
               />
               {formik.errors.end_promo && formik.touched.end_promo && (
                 <div className="text-red-600 text-xs">
@@ -526,20 +580,18 @@ function EventForm() {
               )}
             </div>
           </div>
-
-          <div className="pt-6 w-full">
-            <button
-              type="submit"
-              className="btn btn-dark"
-              disabled={formik.isSubmitting}
-            >
-              Create Event
-            </button>
-          </div>
+          {/* Rest of the form fields */}
+          <button
+            type="submit"
+            className="btn btn-dark mt-4"
+            disabled={formik.isSubmitting}
+          >
+            Update Event
+          </button>
         </form>
       </div>
     </div>
   );
 }
 
-export default EventForm;
+export default EditEventForm;
