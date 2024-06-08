@@ -36,6 +36,7 @@ class EventService {
         title: { contains: title },
       },
       select: {
+        id: true,
         title: true,
         city: true,
         start_time: true,

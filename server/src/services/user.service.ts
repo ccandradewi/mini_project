@@ -273,24 +273,70 @@ class UserService {
         select,
         where: { email: email },
       });
-      if (!data) {
-        return "user not found";
-      }
-      if (data.isVerified) {
-        return "You have previously verified your email";
-      } else {
-        let message = await this.sendingEmail(
-          data.id,
-          email,
-          data?.first_name,
-          "/../templates/verification.html",
-          "Welcome To Tickzy, Please Verify Your Email Address",
-          "verify"
-        );
-        return message;
+      if (data) {
+        if (data.isVerified) {
+          return "You have previously verified your email";
+        } else {
+          let message = await this.sendingEmail(
+            data.id,
+            email,
+            data.first_name,
+            "/../templates/verification.html",
+            "Welcome To Tickzy, Please Verify Your Email Address",
+            "verify"
+          );
+          return message;
+        }
       }
     } catch (error) {
       console.log("error resend email");
+    }
+  }
+  async sendChangePasswordLink(req: Request) {
+    const { email } = req.body;
+    const select: Prisma.UserSelectScalar = {
+      id: true,
+      first_name: true,
+    };
+    const data = await prisma.user.findUnique({
+      select,
+      where: {
+        email: email,
+      },
+    });
+    if (data === null) {
+      return false;
+    } else {
+      let sendEmailResult = await this.sendingEmail(
+        data.id,
+        email,
+        data.first_name,
+        "/../templates/resetpassword.html",
+        "We received request to change your password on Tickzy",
+        "changePassword"
+      );
+      return sendEmailResult;
+    }
+  }
+  async verifyChangePass(req: Request) {
+    try {
+      const { token, newPassword } = req.body;
+      const user = verify(token, SECRET_KEY) as TUser;
+      if (!user || !user.id) {
+        throw new Error("invalid token");
+      }
+      const hashPass = await hashPassword(newPassword);
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: hashPass,
+        },
+      });
+      return "Password changed succesfully!";
+    } catch (error) {
+      return "Failed to change password drom our API";
     }
   }
 }
