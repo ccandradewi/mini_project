@@ -1,6 +1,6 @@
 import { Router } from "express";
 import eventController from "../controllers/event.controller";
-import { verifySeller } from "../middlewares/role.middleware";
+import { verifySeller, verifyEventOwner } from "../middlewares/role.middleware";
 import { blobUploader } from "../libs/multer";
 import {
   validateAccessToken,
@@ -16,8 +16,15 @@ class EventRouter {
   initializedRoutes() {
     this.router.get("/", eventController.getAllEvent);
     this.router.get("/detail/:eventId", eventController.getEventDetail);
+    this.router.get(
+      "/dashboard/detail/:eventId",
+      verifyUser,
+      verifySeller,
+      verifyEventOwner,
+      eventController.getEventDetail
+    );
     this.router.get("/title", eventController.getEventTitle);
-    this.router.get("/filter", eventController.filterEvent);
+    this.router.get("/f", eventController.filterEvent);
     this.router.get(
       "/myEvent",
       verifyUser,

@@ -1,7 +1,12 @@
 import React from "react";
+import DashboardEventDetail from "./_components/DashboardEventDetail";
 
 function page() {
-  return <div>ini page event detail in dashboard</div>;
+  return (
+    <>
+      <DashboardEventDetail />
+    </>
+  );
 }
 
 export default page;

@@ -8,6 +8,7 @@ class EventService {
   async getAll(req: Request) {
     const data = await prisma.event.findMany({
       select: {
+        id: true,
         banner: true,
         title: true,
         city: true,
@@ -15,6 +16,9 @@ class EventService {
         end_time: true,
         ticket_price: true,
         discount_price: true,
+        promotor: true,
+        promo: true,
+        venue: true,
       },
     });
     return data;
@@ -71,6 +75,7 @@ class EventService {
         createdAt: true,
         updatedAt: true,
         venue: true,
+        discount_price: true,
       },
     });
     return data;
@@ -78,25 +83,31 @@ class EventService {
   async getByfilter(req: Request) {
     const { city, category } = req.query;
     let filter: any = {};
+
     if (city && typeof city === "string") {
-      filter.city = city as LocationName;
+      filter.city = city;
     }
     if (category && typeof category === "string") {
-      filter.category = category as CategoryName;
+      filter.category = category;
     }
+
     const data = await prisma.event.findMany({
       where: filter,
       select: {
+        id: true,
         title: true,
         start_time: true,
         ticket_price: true,
+        discount_price: true,
         location: true,
         category: true,
         banner: true,
+        venue: true,
+        city: true,
         promotor: true,
       },
     });
-    if (!data) throw new Error("Event Not Found");
+
     return data;
   }
   async getDetailEvent(req: Request) {
@@ -104,6 +115,7 @@ class EventService {
     const data = await prisma.event.findUnique({
       where: { id: eventId },
       select: {
+        id: true,
         banner: true,
         title: true,
         description: true,
@@ -115,6 +127,12 @@ class EventService {
         category: true,
         promotor: true,
         type: true,
+        ticket_price: true,
+        promo: true,
+        discount_price: true,
+        start_promo: true,
+        end_promo: true,
+        availability: true,
       },
     });
     return data;
@@ -210,57 +228,95 @@ class EventService {
 
     return createEvent;
   }
+
   async updateEvent(req: Request) {
     const { eventId } = req.params;
     const { file } = req;
+    const userId = req.user?.id;
+
     const currentEvent = await prisma.event.findUnique({
-      where: { id: eventId, user_id: req.user?.id },
+      where: { id: eventId, user_id: userId },
       select: { ticket_price: true, type: true },
     });
+
     if (!currentEvent) {
       throw new Error("Event not found");
     }
+
+    const {
+      title,
+      description,
+      start_time,
+      end_time,
+      venue,
+      city,
+      location,
+      category,
+      promotor,
+      type = currentEvent.type,
+      ticket_price = currentEvent.ticket_price,
+      availability,
+      promo,
+      start_promo,
+      end_promo,
+    } = req.body as TEvent;
 
     const promoDiscounts: { [key in Promo]: number } = {
       TEN_PERCENT: 0.1,
       TWENTY_FIVE_PERCENT: 0.25,
       FIFTY_PERCENT: 0.5,
     };
-    const data: Prisma.EventUpdateInput = { ...req.body };
-    const promo = req.body.promo as Promo;
-    const type = req.body.type || currentEvent.type;
-    const ticket_price =
-      req.body.ticket_price !== undefined
-        ? Number(req.body.ticket_price)
-        : currentEvent.ticket_price;
 
+    let ticketPrice;
     let discountPrice;
-    console.log("Extracted fields:", { promo, ticket_price, type });
+
+    if (type === "FREE") {
+      ticketPrice = 0;
+    } else if (type === "PAID") {
+      ticketPrice = Number(ticket_price);
+    }
+
     if (type === "PAID" && promo) {
       const discount = promoDiscounts[promo as keyof typeof promoDiscounts];
       discountPrice = ticket_price
         ? ticket_price - ticket_price * discount
         : null;
-      console.log("Discount calculation:", { discount, discountPrice });
     }
-    if (promo) {
-      data.promo = promo;
-      data.discount_price = discountPrice;
-      console.log("Data object before update:", data);
-    }
+
+    const data: Prisma.EventUpdateInput = {
+      title,
+      description,
+      start_time: start_time ? new Date(start_time).toISOString() : undefined,
+      end_time: end_time ? new Date(end_time) : undefined,
+      venue,
+      city,
+      location,
+      category,
+      promotor,
+      type,
+      availability: availability ? Number(availability) : undefined,
+      ticket_price: ticketPrice,
+      discount_price: discountPrice,
+      promo,
+      start_promo: start_promo
+        ? new Date(start_promo).toISOString()
+        : undefined,
+      end_promo: end_promo ? new Date(end_promo) : undefined,
+    };
 
     if (file) {
       const buffer = await sharp(req.file?.buffer).png().toBuffer();
       data.banner = buffer;
     }
+
     return await prisma.event.update({
       data,
-      where: { id: eventId, user_id: req.user?.id },
+      where: { id: eventId, user_id: userId },
     });
   }
 
   async renderBanner(req: Request) {
-    const data = await prisma.event.findFirst({
+    const data = await prisma.event.findUnique({
       where: {
         id: req.params.id,
       },
