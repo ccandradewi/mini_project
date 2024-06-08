@@ -161,72 +161,82 @@ class EventService {
 
     if (!file) throw new Error("No file uploaded");
     const buffer = await sharp(req.file?.buffer).png().toBuffer();
-    const existingEvent = await prisma.event.findFirst({
-      where: { title },
-    });
-    if (existingEvent)
-      throw new Error(
-        "There is event with the same title. Please choose different title"
-      );
-    if (promo && (!start_promo || !end_promo)) {
-      throw new Error("Please enter the duration of the promo");
-    } else if (
-      promo &&
-      end_promo &&
-      new Date(end_promo) > new Date(start_time)
-    ) {
-      throw new Error("Set end time of the promo before the event starts");
-    } else if (end_promo && new Date(end_promo) > new Date(start_time)) {
-      throw new Error("End time of the promo cannot be after the event starts");
-    }
-    const promoDiscounts: { [key in Promo]: number } = {
-      TEN_PERCENT: 0.1,
-      TWENTY_FIVE_PERCENT: 0.25,
-      FIFTY_PERCENT: 0.5,
-    };
-    let ticketPrice;
-    let discountPrice;
-    if (type === "FREE") {
-      ticketPrice = 0;
-    } else if (type === "PAID") {
-      ticketPrice = Number(ticket_price);
-    }
 
-    if (type === "PAID" && promo) {
-      const discount = promoDiscounts[promo as keyof typeof promoDiscounts];
-      discountPrice = ticket_price
-        ? ticket_price - ticket_price * discount
-        : null;
-    }
-    const createEvent = await prisma.event.create({
-      data: {
-        user: { connect: { id: req.user?.id } },
-        banner: buffer,
-        title,
-        description,
-        start_time: new Date(start_time).toISOString(),
-        end_time: new Date(end_time),
-        venue,
-        city,
-        location,
-        category,
-        promotor,
-        type,
-        availability: Number(availability),
-        ticket_price: ticketPrice,
-        discount_price: discountPrice,
-        promo,
-        start_promo: start_promo
-          ? new Date(start_promo).toISOString()
-          : undefined,
-        end_promo: end_promo ? new Date(end_promo) : undefined,
-      },
-    });
-    console.log(createEvent);
-    console.log(req);
-    console.log("test");
+    return await prisma.$transaction(async (prisma) => {
+      console.log("Transaction started");
 
-    return createEvent;
+      const existingEvent = await prisma.event.findFirst({
+        where: { title },
+      });
+      if (existingEvent) {
+        throw new Error(
+          "There is an event with the same title. Please choose a different title"
+        );
+      }
+
+      if (promo && (!start_promo || !end_promo)) {
+        throw new Error("Please enter the duration of the promo");
+      } else if (
+        promo &&
+        end_promo &&
+        new Date(end_promo) > new Date(start_time)
+      ) {
+        throw new Error("Set end time of the promo before the event starts");
+      } else if (end_promo && new Date(end_promo) > new Date(start_time)) {
+        throw new Error(
+          "End time of the promo cannot be after the event starts"
+        );
+      }
+
+      const promoDiscounts: { [key in Promo]: number } = {
+        TEN_PERCENT: 0.1,
+        TWENTY_FIVE_PERCENT: 0.25,
+        FIFTY_PERCENT: 0.5,
+      };
+      let ticketPrice;
+      let discountPrice;
+      if (type === "FREE") {
+        ticketPrice = 0;
+      } else if (type === "PAID") {
+        ticketPrice = Number(ticket_price);
+      }
+
+      if (type === "PAID" && promo) {
+        const discount = promoDiscounts[promo as keyof typeof promoDiscounts];
+        discountPrice = ticket_price
+          ? ticket_price - ticket_price * discount
+          : null;
+      }
+
+      const createEvent = await prisma.event.create({
+        data: {
+          user: { connect: { id: req.user?.id } },
+          banner: buffer,
+          title,
+          description,
+          start_time: new Date(start_time).toISOString(),
+          end_time: new Date(end_time),
+          venue,
+          city,
+          location,
+          category,
+          promotor,
+          type,
+          availability: Number(availability),
+          ticket_price: ticketPrice,
+          discount_price: discountPrice,
+          promo,
+          start_promo: start_promo
+            ? new Date(start_promo).toISOString()
+            : undefined,
+          end_promo: end_promo ? new Date(end_promo) : undefined,
+        },
+      });
+
+      console.log("Event created:", createEvent);
+
+      return createEvent;
+    });
   }
 
   async updateEvent(req: Request) {
@@ -234,84 +244,115 @@ class EventService {
     const { file } = req;
     const userId = req.user?.id;
 
-    const currentEvent = await prisma.event.findUnique({
-      where: { id: eventId, user_id: userId },
-      select: { ticket_price: true, type: true },
-    });
+    // Start transaction
+    await prisma.$transaction(async (tx) => {
+      // Log the start of the transaction
+      console.log("Transaction started...");
 
-    if (!currentEvent) {
-      throw new Error("Event not found");
-    }
+      const currentEvent = await tx.event.findUnique({
+        where: { id: eventId, user_id: userId },
+        select: { ticket_price: true, type: true },
+      });
 
-    const {
-      title,
-      description,
-      start_time,
-      end_time,
-      venue,
-      city,
-      location,
-      category,
-      promotor,
-      type = currentEvent.type,
-      ticket_price = currentEvent.ticket_price,
-      availability,
-      promo,
-      start_promo,
-      end_promo,
-    } = req.body as TEvent;
+      if (!currentEvent) {
+        throw new Error("Event not found");
+      }
 
-    const promoDiscounts: { [key in Promo]: number } = {
-      TEN_PERCENT: 0.1,
-      TWENTY_FIVE_PERCENT: 0.25,
-      FIFTY_PERCENT: 0.5,
-    };
+      const {
+        title,
+        description,
+        start_time,
+        end_time,
+        venue,
+        city,
+        location,
+        category,
+        promotor,
+        type = currentEvent.type,
+        ticket_price = currentEvent.ticket_price,
+        availability,
+        promo,
+        start_promo,
+        end_promo,
+      } = req.body as TEvent;
 
-    let ticketPrice;
-    let discountPrice;
+      const promoDiscounts: { [key in Promo]: number } = {
+        TEN_PERCENT: 0.1,
+        TWENTY_FIVE_PERCENT: 0.25,
+        FIFTY_PERCENT: 0.5,
+      };
 
-    if (type === "FREE") {
-      ticketPrice = 0;
-    } else if (type === "PAID") {
-      ticketPrice = Number(ticket_price);
-    }
+      let ticketPrice;
+      let discountPrice;
 
-    if (type === "PAID" && promo) {
-      const discount = promoDiscounts[promo as keyof typeof promoDiscounts];
-      discountPrice = ticket_price
-        ? ticket_price - ticket_price * discount
-        : null;
-    }
+      if (type === "FREE") {
+        ticketPrice = 0;
+      } else if (type === "PAID") {
+        ticketPrice = Number(ticket_price);
+      }
 
-    const data: Prisma.EventUpdateInput = {
-      title,
-      description,
-      start_time: start_time ? new Date(start_time).toISOString() : undefined,
-      end_time: end_time ? new Date(end_time) : undefined,
-      venue,
-      city,
-      location,
-      category,
-      promotor,
-      type,
-      availability: availability ? Number(availability) : undefined,
-      ticket_price: ticketPrice,
-      discount_price: discountPrice,
-      promo,
-      start_promo: start_promo
-        ? new Date(start_promo).toISOString()
-        : undefined,
-      end_promo: end_promo ? new Date(end_promo) : undefined,
-    };
+      if (type === "PAID" && promo) {
+        const discount = promoDiscounts[promo as keyof typeof promoDiscounts];
+        discountPrice = ticket_price
+          ? ticket_price - ticket_price * discount
+          : null;
+      }
 
-    if (file) {
-      const buffer = await sharp(req.file?.buffer).png().toBuffer();
-      data.banner = buffer;
-    }
+      const data: Prisma.EventUpdateInput = {
+        title,
+        description,
+        start_time: start_time ? new Date(start_time).toISOString() : undefined,
+        end_time: end_time ? new Date(end_time) : undefined,
+        venue,
+        city,
+        location,
+        category,
+        promotor,
+        type,
+        availability: availability ? Number(availability) : undefined,
+        ticket_price: ticketPrice,
+        discount_price: discountPrice,
+        promo,
+        start_promo: start_promo
+          ? new Date(start_promo).toISOString()
+          : undefined,
+        end_promo: end_promo ? new Date(end_promo) : undefined,
+      };
 
-    return await prisma.event.update({
-      data,
-      where: { id: eventId, user_id: userId },
+      if (file) {
+        const buffer = await sharp(req.file?.buffer).png().toBuffer();
+        data.banner = buffer;
+      }
+
+      // Log updated value
+      const updatedEvent = await tx.event.update({
+        data,
+        where: { id: eventId, user_id: userId },
+        // Log the updated value
+        select: {
+          title: true,
+          description: true,
+          start_time: true,
+          end_time: true,
+          venue: true,
+          city: true,
+          location: true,
+          category: true,
+          promotor: true,
+          type: true,
+          availability: true,
+          ticket_price: true,
+          discount_price: true,
+          promo: true,
+          start_promo: true,
+          end_promo: true,
+        },
+      });
+
+      // Log transaction completion
+      console.log("Transaction completed.");
+
+      return updatedEvent;
     });
   }
 
