@@ -93,6 +93,13 @@ function MyEventCard() {
                     )}
                   </div>
 
+                  <div>
+                    <div className="text-sm">
+                      Tickets available:
+                      <span className="font-bold"> {event.availability} </span>
+                    </div>
+                  </div>
+
                   {event.promo && (
                     <div className="text-sm">
                       Promo period:
