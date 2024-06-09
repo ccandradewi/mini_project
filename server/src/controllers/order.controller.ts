@@ -108,9 +108,10 @@ class OrderController {
 
   async createOrder(req: Request, res: Response, next: NextFunction) {
     try {
-      await orderService.createOrder(req);
+      const data = await orderService.createOrder(req);
       return res.send({
         message: "a buyer successfully made an order",
+        data,
       });
     } catch (error) {
       next(error);
