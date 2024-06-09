@@ -5,39 +5,55 @@ import { useRouter } from "next/navigation";
 import { imageSrc } from "@/utils/image.render";
 import { axiosInstance } from "@/lib/axios.config";
 
-interface Event {
+export interface Event {
   id: string;
+  user_id: string;
   banner: string;
   title: string;
   description: string;
-  start_time: string;
+  city: string;
   location: string;
-  ticket_price: number;
+  type: string;
+  category: string;
   promotor: string;
+  start_time: string;
+  end_time: string;
+  ticket_price: number;
   discount_price?: number;
-  promo?: string;
+  availability: string;
+  promo: string;
+  start_promo: string;
+  end_promo: string;
+  createdAt: string;
+  updatedAt: string;
   venue: string;
 }
 
 interface EventCardProps {
   events: Event[];
   selectedCity: string;
+  searchResults: Event[];
 }
 
-const EventCard: React.FC<EventCardProps> = ({ selectedCity }) => {
+const EventCard: React.FC<EventCardProps> = ({
+  events,
+  selectedCity,
+  searchResults,
+}) => {
   const router = useRouter();
-  const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  // const [events, setEvents] = useState<Event[]>([]);
 
-  const fetchAllEventData = async () => {
-    try {
-      const response = await axiosInstance().get("/event");
-      console.log("All Events Data:", response.data); // Log all events data
-      const { data } = response.data;
-      setEvents(data);
-    } catch (error) {
-      console.error("Error fetching event data:", error);
-    }
-  };
+  // const fetchAllEventData = async () => {
+  //   try {
+  //     const response = await axiosInstance().get("/event");
+  //     console.log("All Events Data:", response.data); // Log all events data
+  //     const { data } = response.data;
+  //     setEvents(data);
+  //   } catch (error) {
+  //     console.error("Error fetching event data:", error);
+  //   }
+  // };
 
   const fetchFilteredEventData = async () => {
     try {
@@ -46,7 +62,7 @@ const EventCard: React.FC<EventCardProps> = ({ selectedCity }) => {
       );
       console.log("Filtered Events Data:", response.data); // Log filtered events data
       const { data } = response.data;
-      setEvents(data);
+      setFilteredEvents(data);
     } catch (error) {
       console.error("Error fetching filtered event data:", error);
     }
@@ -56,14 +72,17 @@ const EventCard: React.FC<EventCardProps> = ({ selectedCity }) => {
     if (selectedCity) {
       fetchFilteredEventData();
     } else {
-      fetchAllEventData(); // Set empty array for "All Cities"
-      setEvents([]);
+      setFilteredEvents(events);
+      // fetchAllEventData(); // Set empty array for "All Cities"
+      // setEvents([]);
     }
-  }, [selectedCity]);
+  }, [selectedCity, events]);
 
   const redirectToEvent = (id: string) => {
     router.push(`/event/${id}`);
   };
+  const eventsToDisplay =
+    searchResults.length > 0 ? searchResults : filteredEvents;
 
   // // Log events for debugging on state change (improved for clear logging)
   // useEffect(() => {
@@ -76,8 +95,8 @@ const EventCard: React.FC<EventCardProps> = ({ selectedCity }) => {
   // Render event cards based on fetched data
   return (
     <div className="flex flex-row flex-wrap gap-4">
-      {events.length > 0 &&
-        events.map((event) => (
+      {eventsToDisplay.length > 0 &&
+        eventsToDisplay.map((event) => (
           <div
             key={event.id}
             className="border w-80 flex flex-col rounded-lg shadow-md overflow-hidden truncate cursor-pointer"

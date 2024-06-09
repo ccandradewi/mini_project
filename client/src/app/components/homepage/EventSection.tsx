@@ -3,25 +3,38 @@ import React, { useState, useEffect } from "react";
 
 import EventCard from "./EventCard";
 import { axiosInstance } from "@/lib/axios.config";
+import SearchBar from "./SearchBar";
 
-interface Event {
+export interface Event {
   id: string;
+  user_id: string;
   banner: string;
   title: string;
   description: string;
-  start_time: string;
+  city: string;
   location: string;
-  ticket_price: number;
+  type: string;
+  category: string;
   promotor: string;
+  start_time: string;
+  end_time: string;
+  ticket_price: number;
   discount_price?: number;
-  promo?: string;
+  availability: string;
+  promo: string;
+  start_promo: string;
+  end_promo: string;
+  createdAt: string;
+  updatedAt: string;
   venue: string;
 }
 
 const EventSection: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [events, setEvents] = useState<Event[]>([]);
-
+  const [query, setQuery] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<Event[]>([]);
+  // const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   useEffect(() => {
     fetchEventData();
   }, [selectedCity]);
@@ -39,7 +52,18 @@ const EventSection: React.FC = () => {
   const handleCityChange = (newCity: string) => {
     setSelectedCity(newCity);
   };
-
+  const handleSearch = async () => {
+    try {
+      const response = await axiosInstance().get("/event/title", {
+        params: {
+          title: query,
+        },
+      });
+      setSearchResults(response.data.data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
   return (
     <div>
       <div className="flex flex-row py-4">
@@ -76,7 +100,18 @@ const EventSection: React.FC = () => {
           </div>
         </div>
         <div className="w-3/4">
-          <EventCard events={events} selectedCity={selectedCity} />
+          <SearchBar
+            query={query}
+            setQuery={setQuery}
+            handleSearch={handleSearch}
+            searchResults={searchResults}
+            // setSelectedEvent={setSelectedEvent}
+          />
+          <EventCard
+            events={events}
+            selectedCity={selectedCity}
+            searchResults={searchResults}
+          />
         </div>
       </div>
     </div>
