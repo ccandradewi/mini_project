@@ -22,6 +22,7 @@ interface Event {
   venue: string;
   start_promo: string;
   end_promo: string;
+  type: string;
 }
 
 function EventDetails() {
@@ -37,33 +38,25 @@ function EventDetails() {
         if (!id) return;
 
         const response = await axiosInstance().get(`/event/detail/${id}`);
-
         const { data } = response.data;
-
         setEvent(data);
-        // setEvent(data);
-        console.log(data);
-
-        // const eventData: Event = response.data;
-        // setEvent(eventData);
-        // console.log(eventData);
       } catch (error) {
         console.error("error fetching", error);
       }
     };
 
     fetchEventData();
-  }, []);
+  }, [id]);
 
   return (
     <>
-      <div className=" w-screen">
+      <div className="w-screen">
         <div className="lg:px-32 py-6">
           {/* BREADCRUMBS */}
           <div className="text-sm breadcrumbs pt-6">
             <ul>
               <li>
-                <a href="/" className="text-black  no-underline">
+                <a href="/" className="text-black no-underline">
                   Home
                 </a>
               </li>
@@ -87,7 +80,7 @@ function EventDetails() {
               <div className="font-bold text-4xl">{event?.title}</div>
               <div className="flex flex-col gap-2">
                 <div className="text-lg flex flex-row items-center gap-2 font-semibold">
-                  <IoCalendarOutline />{" "}
+                  <IoCalendarOutline />
                   {event?.start_time && event?.end_time
                     ? dayjs(event.start_time).isSame(
                         dayjs(event.end_time),
@@ -109,29 +102,15 @@ function EventDetails() {
             </div>
 
             <div className="flex-shrink-0 p-4">
-              {event?.promo ? (
-                <TicketCard
-                  title={event?.title}
-                  price={event?.ticket_price}
-                  discountPrice={event?.discount_price}
-                />
-              ) : (
-                <TicketCard title={event?.title} price={event?.ticket_price} />
-              )}
+              <TicketCard
+                title={event?.title}
+                price={event?.ticket_price}
+                discountPrice={event?.discount_price}
+                id={event?.id}
+                endPromo={event?.end_promo}
+                type={event?.type}
+              />
             </div>
-
-            {/* {event?.promo && (
-              <div className="text-sm">
-                Promo period:
-                <span className="font-bold">
-                  {" "}
-                  {dayjs(event?.start_promo).format("DD MMMM YYYY")} -{" "}
-                </span>
-                <span className="font-bold">
-                  {dayjs(event?.end_promo).format("DD MMMM YYYY")}
-                </span>
-              </div>
-            )} */}
           </div>
         </div>
       </div>
