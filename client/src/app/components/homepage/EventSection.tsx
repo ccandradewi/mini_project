@@ -99,14 +99,16 @@ const EventSection: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="w-3/4">
-          <SearchBar
-            query={query}
-            setQuery={setQuery}
-            handleSearch={handleSearch}
-            searchResults={searchResults}
-            // setSelectedEvent={setSelectedEvent}
-          />
+        <div className="flex flex-col gap-5 w-3/4">
+          <div className="w-3/4">
+            <SearchBar
+              query={query}
+              setQuery={setQuery}
+              handleSearch={handleSearch}
+              searchResults={searchResults}
+              // setSelectedEvent={setSelectedEvent}
+            />
+          </div>
           <EventCard
             events={events}
             selectedCity={selectedCity}
