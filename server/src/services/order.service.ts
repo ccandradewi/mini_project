@@ -145,6 +145,23 @@ class OrderService {
     return data;
   }
 
+  async getVoucherPoint(req: Request) {
+    const { buyerId } = req.params;
+    const data = await prisma.voucherPoint.findMany({
+      where: { user_id: buyerId },
+      select: {
+        id: true,
+        user_id: true,
+        point: true,
+        expired_date: true,
+        voucher: true,
+        isValid: true,
+        createdAt: true,
+      },
+    });
+    return data;
+  }
+
   async createOrder(req: Request) {
     const {
       buyer_id,
@@ -222,9 +239,12 @@ class OrderService {
       total_price = Math.ceil(parsedTotalTicket * event.ticket_price!);
     }
 
+    // jadi kayak ordernya berhenti di function yg ini . log yg keluar cuma ini
     console.log("Initial total_price:", total_price);
 
     if (use_voucher) {
+      if (use_voucher) console.log("using voucher");
+
       // const currentDate = new Date();
       const voucher = await prisma.voucherPoint.findFirst({
         where: {
@@ -295,19 +315,6 @@ class OrderService {
         }
       }
 
-      // bikin create ke prisma
-      const order = await prisma.order.create({
-        data: {
-          buyer_id,
-          event_id,
-          total_ticket: parsedTotalTicket,
-          total_price,
-          date: new Date(),
-          payment_method: payment_method || null,
-          status,
-        },
-      });
-
       // update availability event dikurangi tiket yg hold
       await prisma.event.update({
         where: { id: event_id },
@@ -315,9 +322,20 @@ class OrderService {
           availability: event.availability - parsedTotalTicket,
         },
       });
-
-      return order;
     }
+    const order = await prisma.order.create({
+      data: {
+        buyer_id,
+        event_id,
+        total_ticket: parsedTotalTicket,
+        total_price,
+        date: new Date(),
+        payment_method: payment_method || null,
+        status,
+      },
+    });
+
+    return order;
   }
 
   async updateOrder(req: Request) {}

@@ -94,6 +94,18 @@ class OrderController {
     }
   }
 
+  async getVoucherPoint(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await orderService.getVoucherPoint(req);
+      return res.send({
+        message: "fetch voucher and point data of 1 buyer",
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async deleteOrder(req: Request, res: Response, next: NextFunction) {
     try {
       const deleted_data = await orderService.deleteOrder(req);
