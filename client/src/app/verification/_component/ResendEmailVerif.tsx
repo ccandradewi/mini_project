@@ -2,12 +2,12 @@
 
 import { useAppSelector } from "@/app/hooks";
 import { axiosInstance } from "@/lib/axios.config";
+import { TUser } from "@/models/user.model";
 import { useState } from "react";
 
 export default function ResendEmailVerif() {
   const [responseMessage, setResponseMessage] = useState("");
-  const { email } = useAppSelector((state) => state.auth);
-
+  const { email } = useAppSelector((state) => state.auth) as TUser;
   const resendVerif = async () => {
     try {
       const response = await axiosInstance().post(
