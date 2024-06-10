@@ -1,84 +1,68 @@
-import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import React from "react";
 import { IoPricetagOutline } from "react-icons/io5";
+import dayjs from "dayjs"; // Make sure to import dayjs for date formatting
 
 interface TicketCardProps {
   title?: string;
   price?: number;
   discountPrice?: number;
+  id?: string;
+  endPromo?: string;
+  type?: string;
 }
 
 const TicketCard: React.FC<TicketCardProps> = ({
   title,
   price,
   discountPrice,
+  id,
+  endPromo,
+  type,
 }) => {
-  const [ticketCount, setTicketCount] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(price === 0 ? 0 : price || 0);
-  const isFree = price === 0 || typeof price === "undefined";
+  const router = useRouter();
 
-  useEffect(() => {
-    setTotalPrice(ticketCount * (price === 0 ? 0 : price || 0));
-  }, [ticketCount, price]);
-
-  const handleIncrement = () => {
-    if (ticketCount < 3) {
-      setTicketCount((prevCount) => prevCount + 1);
-    } else {
-      alert("You can only buy 3 tickets at maximum!");
+  const handleBuyTickets = () => {
+    if (id) {
+      router.push(`/checkouts/${id}`);
     }
   };
 
-  const handleDecrement = () => {
-    if (ticketCount > 1) {
-      setTicketCount((prevCount) => prevCount - 1);
-    }
-  };
-
-  const handleBuyTicket = () => {
-    alert(
-      `You have bought ${ticketCount} ticket(s) for a total of ${
-        isFree ? "Free" : `Rp ${totalPrice.toLocaleString()}`
-      }`
-    );
+  const formatPrice = (price: number) => {
+    return `Rp ${price.toLocaleString("id-ID")}`;
   };
 
   return (
     <div className="border flex flex-col rounded-lg shadow-md overflow-hidden p-4 w-[400px]">
       <div className="font-bold text-xl mb-2">{title || "Event Title"}</div>
-
-      <div className="flex flex-row justify-between">
-        <p className="text-lg mb-4 flex flex-row items-center gap-2">
-          <IoPricetagOutline />{" "}
-          {isFree
-            ? "Free"
-            : `Rp ${
-                discountPrice
-                  ? discountPrice.toLocaleString()
-                  : price?.toLocaleString() || "0,00"
-              }`}
-        </p>
-        <p>{ticketCount} ticket</p>
+      <div className="flex items-center mb-2">
+        <IoPricetagOutline className="mr-1" />
+        {type === "FREE" ? (
+          <span>FREE</span>
+        ) : discountPrice ? (
+          <>
+            <span className="line-through mr-2">
+              {price !== undefined ? formatPrice(price) : "N/A"}
+            </span>
+            <span className="text-red-500">{formatPrice(discountPrice)}</span>
+          </>
+        ) : (
+          <span>{price !== undefined ? formatPrice(price) : "N/A"}</span>
+        )}
       </div>
-      <div className="flex items-center  justify-center mb-4">
-        <button className="p-2 border rounded-full" onClick={handleDecrement}>
-          -
-        </button>
-        <span className="px-4">{ticketCount}</span>
-        <button className="p-2 border rounded-full" onClick={handleIncrement}>
-          +
-        </button>
-      </div>
-      {!isFree && (
-        <p className="text-lg font-semibold mb-4">
-          Total: Rp {totalPrice.toLocaleString()}
-        </p>
+      {discountPrice && endPromo && (
+        <div className="text-sm text-gray-500 mb-2">
+          Discount only until {dayjs(endPromo).format("DD MMMM YYYY")}
+        </div>
       )}
-      <button
-        className="px-4 py-2 bg-[#2B2A4C] text-white rounded-lg"
-        onClick={handleBuyTicket}
-      >
-        Buy Ticket
-      </button>
+      <div className="flex flex-row justify-between">
+        <button
+          className="px-4 py-2 bg-[#2B2A4C] text-white rounded-lg"
+          onClick={handleBuyTickets}
+        >
+          Buy Ticket
+        </button>
+      </div>
     </div>
   );
 };
