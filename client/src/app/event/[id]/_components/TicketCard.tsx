@@ -24,7 +24,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
 
   const handleBuyTickets = () => {
     if (id) {
-      router.push(`/checkouts/${id}`);
+      router.push(`/checkout/${id}`);
     }
   };
 
