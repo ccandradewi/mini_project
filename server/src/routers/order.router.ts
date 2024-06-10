@@ -2,6 +2,7 @@ import { Response, Request, NextFunction, Router } from "express";
 // import orderController from "../controllers/order.controller";
 import { verifyUser } from "../middlewares/auth.middleware";
 import orderController from "../controllers/order.controller";
+import { verifyBuyer } from "../middlewares/role.middleware";
 
 class OrderRouter {
   private router: Router;
@@ -27,7 +28,7 @@ class OrderRouter {
     );
     this.router.get("/vp/:buyerId", orderController.getVoucherPoint);
     this.router.delete("/:orderId", orderController.deleteOrder);
-    this.router.post("/", orderController.createOrder);
+    this.router.post("/", verifyUser, verifyBuyer, orderController.createOrder);
 
     // this.router.post("/v1", orderController.createOrder);
   }

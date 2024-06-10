@@ -338,7 +338,14 @@ class OrderService {
     return order;
   }
 
-  async updateOrder(req: Request) {}
+  // router.push(/invoice/{orderId})
+
+  async updateOrder(req: Request) {
+    // upload payment
+    // keluarin payment date
+    // ganti status -> confirmed
+    // nodemailer eticket
+  }
 
   async deleteOrder(req: Request) {
     const { orderId } = req.params;
