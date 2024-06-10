@@ -128,35 +128,35 @@ model Event {
 }
 
 enum StatusOrder {
-  CONFIRMED
-  CANCELLED
-  PENDING
+  confirmed
+  pending
+  cancelled
 }
 
 enum PaymentMethod {
-  VIRTUAL_ACCOUNT
-  GOPAY
-  BANK_TRANSFER
-  SHOPEEPAY
-  CREDIT_DEBIT_CARD
+  virtualaccount
+  gopay
+  bank
+  shopeepay
+  debitcard
 }
 
 model Order {
-  id             String        @id @default(cuid())
-  user           User          @relation(fields: [buyer_id], references: [id])
+  id             String         @id @default(cuid())
+  user           User           @relation(fields: [buyer_id], references: [id])
   buyer_id       String
-  event          Event         @relation(fields: [event_id], references: [id])
+  event          Event          @relation(fields: [event_id], references: [id])
   event_id       String
   total_ticket   Int
-  total_price    Float         @db.Double
+  total_price    Float          @db.Double
   date           DateTime
-  payment_date   DateTime
-  payment_method PaymentMethod
-  payment_proof  Bytes         @db.LongBlob
-  status         StatusOrder
+  payment_date   DateTime?
+  payment_method PaymentMethod?
+  payment_proof  Bytes?         @db.LongBlob
+  status         StatusOrder    @default(pending)
   Review         Review[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   @@map("orders")
 }

@@ -8,9 +8,9 @@ export type TOrder = {
   totalTicket: number;
   totalPrice: number;
   paymentMethod: PaymentMethod;
-  paymentProof: Buffer | null;
+  paymentProof?: Buffer | null;
   date: Date;
-  paymentDate: Date;
+  paymentDate?: Date;
   status: StatusOrder;
   createdAt?: Date;
   updatedAt?: Date;
