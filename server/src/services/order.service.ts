@@ -51,6 +51,27 @@ class OrderService {
         status: true,
         createdAt: true,
         updatedAt: true,
+        event: {
+          select: {
+            id: true,
+            banner: true,
+            title: true,
+            description: true,
+            city: true,
+            category: true,
+            start_time: true,
+            end_time: true,
+            ticket_price: true,
+            availability: true,
+            promo: true,
+            start_promo: true,
+            end_promo: true,
+            createdAt: true,
+            updatedAt: true,
+            venue: true,
+            discount_price: true,
+          },
+        },
       },
     });
     return data;
