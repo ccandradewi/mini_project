@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "@/app/components/Navbar";
 import EventDetails from "./_components/EventDetails";
+import Navbar from "@/app/components/navbar";
 
 function page() {
   return (
