@@ -77,6 +77,39 @@ class OrderService {
     return data;
   }
 
+  async getOrderId(req: Request) {
+    const { buyer_id, event_id, total_price } = req.body;
+
+    if (!buyer_id || !event_id || !total_price) {
+      throw new Error("Missing required parameters");
+    }
+
+    const data = await prisma.order.findFirst({
+      where: {
+        buyer_id: buyer_id.toString(), // Mengonversi ke string jika diperlukan
+        event_id: event_id.toString(),
+        total_price: parseFloat(total_price.toString()), // Jika total_price adalah string, konversi ke float
+      },
+      select: {
+        id: true,
+        buyer_id: true,
+        event_id: true,
+        total_ticket: true,
+        total_price: true,
+        date: true,
+        payment_date: true,
+        payment_method: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!data) throw new Error("Order not found");
+
+    return data;
+  }
+
   async getOrderBySellerId(req: Request) {
     const { sellerId } = req.params;
     const data = await prisma.order.findMany({
@@ -170,111 +203,43 @@ class OrderService {
       payment_method,
       use_voucher,
       use_point,
-      // point sm voucher true/false ketika user mau pake voucher apa enggak
       status = StatusOrder.pending,
+      total_price, // Assuming total_price is calculated on the frontend
     } = req.body;
 
-    // VALIDATE KETIKA HARGA TIKET < TOTAL POINT
-    // ketika tiket > point
-    // point = 100.000
-    // tiket = 30.000
-    // point = point - hargatiket -> update model VoucherPoint
-    // harga tiket = 0 -> model Order
+    // Log the received request body
+    console.log("Received request body:", req.body);
 
-    // cek input field
-    if (!buyer_id || !event_id || !total_ticket || !payment_method) {
+    // Validate required fields
+    if (!buyer_id || !event_id || !total_ticket) {
       throw new Error("Missing required fields");
     }
 
-    // ticket dr req body string, convert ke integer
-    const parsedTotalTicket = parseInt(total_ticket, 10);
+    // Log validation success
+    console.log("Required fields validation successful");
 
-    // validate jmlh tiket, min 1, max 3
-    if (parsedTotalTicket < 1) {
-      throw new Error("Pick at least one ticket");
-    } else if (parsedTotalTicket > 3) {
-      throw new Error("Maximum of 3 tickets per order is allowed");
-    }
-
-    if (use_voucher && use_point) {
-      throw new Error("Cannot use both voucher and points in a single order");
-    }
-    // cari event, utk validasi
+    // Fetch the event and validate it
     const event = await prisma.event.findUnique({ where: { id: event_id } });
+    if (!event) throw new Error("Invalid event");
 
-    if (!event) {
-      throw new Error("Invalid event");
-    }
+    // Log event details
+    console.log("Event details:", event);
 
-    if (event.end_time < new Date()) {
-      throw new Error("Event has already ended");
-    }
-
-    if (event.start_time < new Date()) {
-      throw new Error("Event has already started");
-    }
-
-    if (event.availability < parsedTotalTicket) {
+    if (event.availability < total_ticket)
       throw new Error("Not enough available tickets");
+
+    // Log event validation success
+    console.log("Event validation successful");
+
+    // Validate voucher and point usage for free events
+    if ((use_voucher || use_point) && event.type === "FREE") {
+      throw new Error("Cannot use voucher or points for free events");
     }
 
-    // cek gak bisa pakai voucher kalo event free
-    if (use_voucher && event.type === "FREE") {
-      throw new Error("Cannot use voucher for free events");
-    }
+    // Log voucher and point validation success
+    console.log("Voucher and point validation successful");
 
-    // cek gak bisa pakai point kalo event free
-    if (use_point && event.type === "FREE") {
-      throw new Error("Cannot use points for free events");
-    }
-
-    // hitung total harga berdasarkan jenis acara dan promo ada/gak/tglnya
-    let total_price: number;
-
-    if (event.type === "FREE") {
-      total_price = 0;
-    } else if (event.promo && event.end_promo && new Date() < event.end_promo) {
-      total_price = Math.ceil(parsedTotalTicket * event.discount_price!);
-    } else {
-      total_price = Math.ceil(parsedTotalTicket * event.ticket_price!);
-    }
-
-    // jadi kayak ordernya berhenti di function yg ini . log yg keluar cuma ini
-    console.log("Initial total_price:", total_price);
-
-    if (use_voucher) {
-      if (use_voucher) console.log("using voucher");
-
-      // const currentDate = new Date();
-      const voucher = await prisma.voucherPoint.findFirst({
-        where: {
-          user_id: buyer_id,
-          isValid: true,
-        },
-      });
-
-      console.log("Voucher found:", voucher);
-
-      if (!voucher || voucher.voucher === 0) {
-        throw new Error("You have no voucher");
-      }
-
-      // total price ketika pake voucher dan valid
-      if (voucher) {
-        total_price = total_price - total_price * 0.1;
-
-        console.log("Discount applied, new total_price:", total_price);
-
-        // Update voucher point
-        await prisma.voucherPoint.update({
-          where: { id: voucher.id },
-          data: {
-            isValid: false,
-            voucher: 0,
-          },
-        });
-      }
-    }
+    let adjustedTotalPrice = total_price;
 
     if (use_point) {
       const currentDate = new Date();
@@ -291,18 +256,18 @@ class OrderService {
       }
 
       if (pointData) {
-        // gabisa kalo harga tiket lebih mahal dari poin
-        if (total_price <= pointData.point) {
-          throw new Error("Total price must be greater than total points");
-        }
-
-        if (pointData) {
-          total_price = Math.max(0, total_price - pointData.point);
-          // total price gak boleh kurang dari 0 utk bs pake voucher
-
-          console.log("Point applied, new total_price:", total_price);
-
-          // update tabel voucher point -> point jd 0, dan gbs dipake lg
+        const ticketPrice = event?.ticket_price ?? 0; // Retrieve ticket price from event
+        const pointToDeduct = total_ticket * ticketPrice;
+        if (pointData.point >= pointToDeduct) {
+          // If points are greater than or equal to the total price of tickets
+          await prisma.voucherPoint.update({
+            where: { id: pointData.id },
+            data: {
+              point: pointData.point - pointToDeduct,
+            },
+          });
+        } else {
+          // If points are less than the total price of tickets
           await prisma.voucherPoint.update({
             where: { id: pointData.id },
             data: {
@@ -310,30 +275,70 @@ class OrderService {
               expired_date: currentDate,
             },
           });
-
-          console.log("Point updated:", pointData);
         }
+
+        console.log("Points updated:", pointData);
+      }
+    }
+
+    if (use_voucher) {
+      console.log("Using voucher");
+
+      const voucher = await prisma.voucherPoint.findFirst({
+        where: {
+          user_id: buyer_id,
+          isValid: true,
+        },
+      });
+
+      console.log("Voucher found:", voucher);
+
+      if (!voucher || voucher.voucher === 0) {
+        throw new Error("You have no voucher");
       }
 
-      // update availability event dikurangi tiket yg hold
-      await prisma.event.update({
-        where: { id: event_id },
+      // Apply a 10% discount
+      const voucherDiscount = adjustedTotalPrice * 0.1;
+      adjustedTotalPrice -= voucherDiscount;
+
+      await prisma.voucherPoint.update({
+        where: { id: voucher.id },
         data: {
-          availability: event.availability - parsedTotalTicket,
+          isValid: false,
+          voucher: 0,
         },
       });
     }
+
+    // Ensure total price is not negative
+    adjustedTotalPrice = Math.max(0, adjustedTotalPrice);
+
+    // Update event availability
+    await prisma.event.update({
+      where: { id: event_id },
+      data: {
+        availability: event.availability - total_ticket,
+      },
+    });
+
+    // Log event availability update success
+    console.log("Event availability update successful");
+
+    // Create the order
     const order = await prisma.order.create({
       data: {
         buyer_id,
         event_id,
-        total_ticket: parsedTotalTicket,
-        total_price,
+        total_ticket,
+        total_price: adjustedTotalPrice,
         date: new Date(),
         payment_method: payment_method || null,
         status,
       },
     });
+
+    // Log order creation success
+    console.log("Order creation successful:", order);
 
     return order;
   }
