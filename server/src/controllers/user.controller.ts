@@ -78,9 +78,10 @@ class UserController {
   }
   async resendEmail(req: Request, res: Response, next: NextFunction) {
     try {
-      let response = await userService.resendVerification(req);
+      let { email, message } = await userService.resendVerification(req);
       res.status(201).send({
-        message: response,
+        message,
+        email,
       });
     } catch (error) {
       next(error);

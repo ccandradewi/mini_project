@@ -7,6 +7,7 @@ import { useState } from "react";
 
 export default function ResendEmailVerif() {
   const [responseMessage, setResponseMessage] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const { email } = useAppSelector((state) => state.auth) as TUser;
   const resendVerif = async () => {
     try {
@@ -16,6 +17,7 @@ export default function ResendEmailVerif() {
         { headers: { "Content-Type": "application/json" } }
       );
       setResponseMessage(response.data.message);
+      setUserEmail(response.data.email);
     } catch (error) {
       console.log("Error caling API");
       setResponseMessage("API call failed");
@@ -39,6 +41,7 @@ export default function ResendEmailVerif() {
         {responseMessage && (
           <div className="mt-10 text-center font-medium text-blue-600">
             <p>{responseMessage}</p>
+            {userEmail && <p>Email: {userEmail}</p>}
           </div>
         )}
       </div>
