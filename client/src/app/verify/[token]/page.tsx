@@ -38,8 +38,20 @@ const VerifyEmail = () => {
   }, [token, router]);
 
   return (
-    <div>
-      <h1>Verifying your email.. </h1>
+    <div className="w-screen h-screen flex justify-center items-center">
+      <div className="flex flex-col items-center">
+        <div>
+          <img
+            src="https://i.ibb.co.com/7z86RmZ/otp-security.png"
+            alt="verification"
+            className="w-[300px]"
+          />
+        </div>
+        <div className="font-bold text-3xl py-4">Verifying your email...</div>
+        <div className="text-zinc-600 text-xl">
+          You will be redirected to the login page.
+        </div>
+      </div>
     </div>
   );
 };

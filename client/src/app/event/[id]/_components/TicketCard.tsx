@@ -24,7 +24,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
 
   const handleBuyTickets = () => {
     if (id) {
-      router.push(`/checkouts/${id}`);
+      router.push(`/checkout/${id}`);
     }
   };
 
@@ -56,10 +56,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
         </div>
       )}
       <div className="flex flex-row justify-between">
-        <button
-          className="px-4 py-2 bg-[#2B2A4C] text-white rounded-lg"
-          onClick={handleBuyTickets}
-        >
+        <button className="btn btn-dark" onClick={handleBuyTickets}>
           Buy Ticket
         </button>
       </div>

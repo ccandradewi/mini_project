@@ -4,9 +4,10 @@ import "./globals.css";
 import "bootstrap/dist/css/bootstrap.css";
 import { StoreProvider } from "@/components/provider/redux.provider";
 const inter = Inter({ subsets: ["latin"] });
+// import Head from "next/head";
 
 export const metadata: Metadata = {
-  title: "Minpro",
+  title: "Tickzy",
 };
 
 export default function RootLayout({
@@ -15,12 +16,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <main>
-          <StoreProvider>{children}</StoreProvider>
-        </main>
-      </body>
-    </html>
+    <>
+      {/* <Head>
+        <img
+          src="https://i.ibb.co.com/XWMvj0b/Tickzy-1.png"
+          alt=""
+          rel="icon"
+        />
+      </Head> */}
+
+      <html lang="en">
+        <body>
+          <main>
+            <StoreProvider>{children}</StoreProvider>
+          </main>
+        </body>
+      </html>
+    </>
   );
 }
