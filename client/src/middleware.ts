@@ -44,6 +44,8 @@ export async function middleware(request: NextRequest) {
 
   const validate = res ? true : false;
   console.log(res, validate, is_verified);
+  console.log(pathname.startsWith("/dashboard"), validate, isBuyer);
+
   if (!token) {
     if (pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(new URL("/", request.url));
@@ -60,7 +62,7 @@ export async function middleware(request: NextRequest) {
     !is_verified
   )
     return NextResponse.redirect(new URL("/verification", request.url));
-  else if (pathname == "/dashboard" && validate && isBuyer) {
+  else if (pathname.startsWith("/dashboard") && validate && isBuyer) {
     return NextResponse.redirect(new URL("/", request.url));
   } else if (validate && pathname.startsWith("/auth")) {
     if (!isBuyer)
@@ -113,5 +115,5 @@ export async function middleware(request: NextRequest) {
 // };
 
 export const config = {
-  matcher: ["/", "/auth/:path*", "/verification", "/dashboard"],
+  matcher: ["/", "/auth/:path*", "/verification", "/dashboard/:path*"],
 };
