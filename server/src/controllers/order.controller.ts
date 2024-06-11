@@ -42,7 +42,7 @@ class OrderController {
     try {
       const data = await orderService.getOrderByOrderId(req);
       return res.send({
-        message: "fetch order detail",
+        message: "fetch order id",
         data,
       });
     } catch (error) {
@@ -136,6 +136,16 @@ class OrderController {
       return res.send({
         message: "a buyer successfully made an order",
         data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateOrder(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await orderService.updateOrder(req);
+      return res.send({
+        message: "success upload payment proof",
       });
     } catch (error) {
       next(error);

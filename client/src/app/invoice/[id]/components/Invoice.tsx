@@ -9,6 +9,7 @@ import {
   IoCalendarOutline,
   IoLocationOutline,
 } from "react-icons/io5";
+import { Console } from "console";
 
 interface User {}
 
@@ -67,12 +68,15 @@ function Invoice() {
   const [countdown, setCountdown] = useState<string | null>("");
 
   useEffect(() => {
+    console.log("cobaaaaaaa");
     const fetchOrderData = async () => {
       try {
         if (!id) return;
 
         const response = await axiosInstance().get(`/orders/${id}`);
         const { data } = response.data;
+        console.log("respons", response);
+        console.log(data.event.title);
         setOrder(data);
         console.log("Order data:", data);
       } catch (error) {
@@ -253,7 +257,7 @@ function Invoice() {
                     </div>
                     <div className="">
                       <div className="font-semibold">
-                        {order?.event.title} (Regular)
+                        {order?.event?.title} (Regular)
                       </div>
                       <div className="text-zinc-600">
                         {order?.total_ticket}{" "}
@@ -269,7 +273,7 @@ function Invoice() {
                     </div>
                     <div className="flex flex-row items-center gap-2">
                       <IoLocationOutline /> {order?.event?.venue},{" "}
-                      {order?.event.location}
+                      {order?.event?.location}
                     </div>
                   </div>
                 </div>

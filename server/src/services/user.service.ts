@@ -53,7 +53,12 @@ class UserService {
 
     const accessToken = createToken(data, "15m");
     const refreshToken = createToken({ id: data.id }, "1hr");
-    return { accessToken, refreshToken, role: data.role };
+    return {
+      accessToken,
+      refreshToken,
+      role: data.role,
+      referral_code: data.referral_code,
+    };
   }
 
   async sendingEmail(

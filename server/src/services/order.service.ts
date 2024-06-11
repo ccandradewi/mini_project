@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { prisma } from "../libs/prisma";
-import { StatusOrder } from "@prisma/client";
+import { Prisma, StatusOrder } from "@prisma/client";
 import { TEvent } from "../model/event.model";
 import sharp from "sharp";
 import { TOrder } from "../model/order.model";
@@ -64,9 +64,8 @@ class OrderService {
   }
 
   async getOrderByBuyerId(req: Request) {
-    const { buyerId } = req.params;
     const data = await prisma.order.findMany({
-      where: { buyer_id: buyerId },
+      where: { buyer_id: req.user?.id },
       select: {
         id: true,
         buyer_id: true,
@@ -79,6 +78,27 @@ class OrderService {
         status: true,
         createdAt: true,
         updatedAt: true,
+        event: {
+          select: {
+            id: true,
+            banner: true,
+            title: true,
+            description: true,
+            city: true,
+            category: true,
+            start_time: true,
+            end_time: true,
+            ticket_price: true,
+            availability: true,
+            promo: true,
+            start_promo: true,
+            end_promo: true,
+            createdAt: true,
+            updatedAt: true,
+            venue: true,
+            discount_price: true,
+          },
+        },
       },
     });
     return data;
@@ -388,16 +408,37 @@ class OrderService {
   }
 
   async updateOrder(req: Request) {
-    // upload payment
-    const { id } = req.params;
+    const { orderId } = req.params;
     const { file } = req;
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        event: true,
+      },
+    });
 
-    // const { pa } = req.body as TOrder;
-    // keluarin payment date
-    // ganti status -> confirmed
-    // nodemailer eticket
+    if (!order) {
+      throw new Error("Order Not Found");
+    }
+
+    let paymentProofBuffer: Buffer | null = order.payment_proof;
+    let status = order.status;
+
+    if (file) {
+      paymentProofBuffer = await sharp(file.buffer).png().toBuffer();
+      status = "confirmed";
+    }
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        payment_date: new Date(),
+        payment_proof: paymentProofBuffer,
+        status: status,
+        updatedAt: new Date(),
+      },
+    });
+    return updatedOrder;
   }
-
   async deleteOrder(req: Request) {
     const { orderId } = req.params;
 
