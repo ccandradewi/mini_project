@@ -189,7 +189,7 @@ function DetailCheckouts() {
       total_ticket: totalTicket,
       payment_method: paymentMethod,
       total_price: totalPrice,
-      status: "pending",
+      status: totalPrice === 0 ? "confirmed" : "pending",
       use_point: usePoints,
       use_voucher: useVoucher,
       updated_points: updatedPoints,
@@ -207,30 +207,68 @@ function DetailCheckouts() {
       }
 
       const orderId = orderData.id;
-      console.log("id from recent order:", orderId);
+      console.log("ID from recent order:", orderId);
 
-      router.push(`/invoice/${orderId}`);
+      if (totalPrice === 0) {
+        // For free events, redirect to success page
+        router.push(`/success`);
+      } else {
+        // For paid events, redirect to invoice page
+        router.push(`/invoice/${orderId}`);
+      }
     } catch (error) {
       console.error("Error placing order:", error);
     }
   };
 
+  const handleBackToEventDetail = () => {
+    // Replace '/event-detail' with the actual route for event detail
+    router.push(`/event/${event?.id}`);
+  };
+
   return (
     <>
       <div>
-        <div className="flex flex-col p-10">
+        {/* BREADCRUMBS */}
+        <div className="text-sm breadcrumbs px-2 pt-10">
+          <ul>
+            <li>
+              <a href="/" className="text-black no-underline">
+                Home
+              </a>
+            </li>
+            {event?.title && (
+              <>
+                <li>
+                  <a
+                    onClick={handleBackToEventDetail}
+                    className="text-black no-underline cursor-pointer"
+                  >
+                    {event?.title}
+                  </a>
+                </li>
+                <li className="font-semibold text-[#B31312]">Buy Ticket</li>
+              </>
+            )}
+          </ul>
+        </div>
+
+        <div className="flex flex-col px-10">
           <div className="flex flex-col gap-3">
             <div className="text-zinc-500">Select your tickets for</div>
             <div className="text-3xl font-bold">{event?.title}</div>
 
             <div>
               Tickets for {dayjs(event?.start_time).format("DD MMMM YYYY")} -{" "}
-              {dayjs(event?.end_time).format("DD MMMM YYYY")}
+              {dayjs(event?.end_time).isSame(event?.start_time, "day")
+                ? dayjs(event?.start_time).format("HH:mm")
+                : dayjs(event?.end_time).format("DD MMMM YYYY")}
             </div>
           </div>
 
           <div className="flex flex-row gap-4 py-4">
-            <div className="w-2/3 flex flex-row justify-between rounded-xl p-4 border-1 items-start">
+            {/* SECTION TICKET */}
+            <div className="w-2/3 flex flex-row justify-between rounded-xl p-4 border-1 items-start h-80">
               <div className="flex-col justify-between flex h-full">
                 <div className="flex flex-col gap-2">
                   <div className="font-bold text-lg">REGULAR</div>
@@ -274,6 +312,7 @@ function DetailCheckouts() {
               </div>
             </div>
 
+            {/* SECTION ORDER SUMMARY */}
             <div className="w-1/3 flex flex-col gap-2 p-4 border-1 rounded-xl justify-center">
               <div className="font-semibold text-xl">Order summary</div>
               <div className="flex flex-row justify-between">
