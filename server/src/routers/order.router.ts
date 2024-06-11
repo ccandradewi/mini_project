@@ -3,6 +3,7 @@ import { Response, Request, NextFunction, Router } from "express";
 import { verifyUser } from "../middlewares/auth.middleware";
 import orderController from "../controllers/order.controller";
 import { verifyBuyer } from "../middlewares/role.middleware";
+import { blobUploader } from "../libs/multer";
 
 class OrderRouter {
   private router: Router;
@@ -15,8 +16,18 @@ class OrderRouter {
   initializedRoutes() {
     this.router.get("/", orderController.getAll);
     this.router.get("/:orderId", orderController.getOrderByOrderId);
+    this.router.patch(
+      "/:orderId",
+      blobUploader().single("payment_proof"),
+      orderController.updateOrder
+    );
     this.router.get("/seller/:sellerId", orderController.getOrderBySellerId);
-    this.router.get("/buyer/:buyerId", orderController.getOrderByBuyerId);
+    this.router.get(
+      "/buyer/myTicket",
+      verifyUser,
+      verifyBuyer,
+      orderController.getOrderByBuyerId
+    );
     this.router.get("/event/:eventId", orderController.getOrderByEventId);
     this.router.get(
       "/seller/:sellerId/status/:status",

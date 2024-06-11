@@ -24,11 +24,11 @@ const Sidebar2 = () => {
   };
   const handleTicket = () => {
     console.log("Navigating to My Ticket");
-    router.push(`/member/my-ticket/${loggedinUser.id}`);
+    router.push(`/member/my-ticket`);
   };
 
   const loggedinUser = useAppSelector((state) => state.auth) as TUser;
-  console.log("Sidebar:", loggedinUser);
+
   return (
     <div className="w-64 h-screen bg-[#2B2A4C] text-white flex flex-col justify-between">
       <div>

@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { prisma } from "../libs/prisma";
-import { StatusOrder } from "@prisma/client";
+import { Prisma, StatusOrder } from "@prisma/client";
 import { TEvent } from "../model/event.model";
 import sharp from "sharp";
 
@@ -36,9 +36,8 @@ class OrderService {
   }
 
   async getOrderByBuyerId(req: Request) {
-    const { buyerId } = req.params;
     const data = await prisma.order.findMany({
-      where: { buyer_id: buyerId },
+      where: { buyer_id: req.user?.id },
       select: {
         id: true,
         buyer_id: true,
@@ -362,12 +361,37 @@ class OrderService {
   // router.push(/invoice/{orderId})
 
   async updateOrder(req: Request) {
-    // upload payment
-    // keluarin payment date
-    // ganti status -> confirmed
-    // nodemailer eticket
-  }
+    const { orderId } = req.params;
+    const { file } = req;
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        event: true,
+      },
+    });
 
+    if (!order) {
+      throw new Error("Order Not Found");
+    }
+
+    let paymentProofBuffer: Buffer | null = order.payment_proof;
+    let status = order.status;
+
+    if (file) {
+      paymentProofBuffer = await sharp(file.buffer).png().toBuffer();
+      status = "confirmed";
+    }
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        payment_date: new Date(),
+        payment_proof: paymentProofBuffer,
+        status: status,
+        updatedAt: new Date(),
+      },
+    });
+    return updatedOrder;
+  }
   async deleteOrder(req: Request) {
     const { orderId } = req.params;
 

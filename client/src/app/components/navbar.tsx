@@ -105,7 +105,7 @@ export default function Navbar({}: Props) {
                   tabIndex={-1}
                 >
                   <a
-                    href="/member"
+                    href="/member/my-ticket"
                     className="block px-4 py-2 text-sm text-gray-700"
                     role="menuitem"
                     tabIndex={-1}

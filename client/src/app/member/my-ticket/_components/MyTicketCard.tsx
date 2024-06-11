@@ -43,20 +43,12 @@ interface Order {
 
 function MyTicketCard() {
   const router = useRouter();
-  const params = useParams();
-  const { id } = params;
-  console.log("Params:", params); // Log params to check if id is being extracted
-  console.log("Buyer ID:", id);
-
-  //   const redirectToEvent = (id: string) => {
-  //     router.push(`/dashboard/my-event/${id}`);
-  //   };
 
   const [orders, setOrders] = useState<Order[]>([]);
 
   const fetchOrderData = async () => {
     try {
-      const response = await axiosInstance().get(`/orders/buyer/${id}`);
+      const response = await axiosInstance().get("/orders/buyer/myTicket");
       console.log("Response data:", response.data);
       const orders: Order[] = response.data.data;
       // const eventList = orders.map((order) => order.event);
