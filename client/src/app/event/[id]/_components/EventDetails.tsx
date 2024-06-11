@@ -50,7 +50,7 @@ function EventDetails() {
 
   return (
     <>
-      <div className="w-screen">
+      <div className="w-screen h-screen">
         <div className="lg:px-32 py-6">
           {/* BREADCRUMBS */}
           <div className="text-sm breadcrumbs pt-6">

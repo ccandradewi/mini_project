@@ -59,15 +59,21 @@ const LoginForm: React.FC = () => {
   return (
     <div className="w-screen h-screen">
       <div className="flex flex-row">
-        <div className="w-1/2">ini foto</div>
+        <div className="w-1/2">
+          <img
+            src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt=""
+            className="h-screen w-full object-cover position-top saturate-0"
+          />
+        </div>
 
         <div className="w-1/2 h-screen flex flex-col items-center justify-center">
-          <div className="w-[100px]">
+          <a href="/" className="w-[130px]">
             <img
-              src="https://i.ibb.co.com/yqxWWt2/Tickzy-2.png"
+              src="https://i.ibb.co.com/cCF1xH7/Tickzy-3.png"
               alt="tickzy logo"
             />
-          </div>
+          </a>
           <h1 className="pt-8">Welcome Back!</h1>
           <div className="pb-8">Please log into your account.</div>
           <form
@@ -102,20 +108,23 @@ const LoginForm: React.FC = () => {
             </div>
             <Link
               href="/auth/passwordreset"
-              className="link-primary text-decoration-none"
+              className="text-[#3b3a7a] text-decoration-none font-semibold hover:text-[#666699]"
             >
               Forgot password?
             </Link>
             <button
               type="submit"
-              className="btn my-4 btn-neutral"
+              className="btn my-4 btn-dark"
               disabled={!isFormEmpty}
             >
               Sign In
             </button>
             <p className="py-4">
               {"Don't have an account? "}
-              <a href="/auth/register" className="text-black">
+              <a
+                href="/auth/register"
+                className="text-[#3b3a7a] font-semibold text-decoration-none hover:text-[#666699]"
+              >
                 {" "}
                 Register here.
               </a>

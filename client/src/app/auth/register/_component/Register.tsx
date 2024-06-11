@@ -59,33 +59,28 @@ const Register = () => {
     }
   }, [formik.values]);
   return (
-    <section className="p-3 p-md-4 p-xl-5">
-      <div className="container">
-        <div className="row">
-          <div className="col-12 col-md-6 bsb-tpl-bg-platinum">
-            <div className="d-flex flex-column justify-content-between h-100 p-3 p-md-4 p-xl-5">
-              <h3 className="m-0">Welcome!</h3>
-              {/* <img /> */}
-              <p className="mb-0">
-                Not a member yet?{" "}
-                <a href="#!" className="link-secondary text-decoration-none">
-                  Register now
-                </a>
-              </p>
-            </div>
+    <>
+      <div className="w-screen">
+        <div className="flex flex-row">
+          <div className="w-1/2">
+            <img
+              src="https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              alt=""
+              className="h-full w-full object-cover position-bottom saturate-0"
+            />
           </div>
-          <div className="col-12 col-md-6 bsb-tpl-bg-lotion">
+
+          <div className="w-1/2 flex flex-col items-center justify-center lg:px-20 lg:py-10">
             <div className="p-3 p-md-4 p-xl-5">
-              <div className="row">
-                <div className="col-12">
-                  <div className="mb-5">
-                    <h2 className="h3">Registration</h2>
-                    <h3 className="fs-6 fw-normal text-secondary m-0">
-                      Enter your details to register
-                    </h3>
-                  </div>
+              <div className="col-12">
+                <div className="mb-5">
+                  <h2 className="h3">Registration</h2>
+                  <h3 className="fs-6 fw-normal text-secondary m-0">
+                    Enter your details to register
+                  </h3>
                 </div>
               </div>
+
               <form onSubmit={formik.handleSubmit}>
                 <div className="row gy-3 gy-md-4 overflow-hidden">
                   <div className="col-12">
@@ -233,10 +228,7 @@ const Register = () => {
                   </div>
                   <div className="col-12">
                     <div className="d-grid">
-                      <button
-                        className="btn bsb-btn-xl btn-primary"
-                        type="submit"
-                      >
+                      <button className="btn bsb-btn-xl btn-dark" type="submit">
                         Sign up
                       </button>
                     </div>
@@ -251,7 +243,7 @@ const Register = () => {
                     <Link
                       href="/auth/login"
                       passHref
-                      className="link-primary text-decoration-none"
+                      className="text-[#3b3a7a] font-semibold text-decoration-none hover:text-[#666699]"
                     >
                       Sign in
                     </Link>
@@ -262,7 +254,7 @@ const Register = () => {
           </div>
         </div>
       </div>
-    </section>
+    </>
   );
 };
 

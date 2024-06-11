@@ -12,6 +12,7 @@ export const verifyUser = (req: Request, res: Response, next: NextFunction) => {
   } catch (error) {
     console.log("jwt error");
     next(error);
+    console.log(error);
   }
 };
 

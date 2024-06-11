@@ -157,6 +157,7 @@ model Order {
   Review         Review[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+  inv_id         String?
 
   @@map("orders")
 }

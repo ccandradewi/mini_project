@@ -14,6 +14,18 @@ class OrderController {
     }
   }
 
+  async getOrderId(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await orderService.getOrderId(req);
+      return res.send({
+        message: "fetch orderId",
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getOrderBySellerId(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await orderService.getOrderBySellerId(req);

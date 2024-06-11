@@ -29,6 +29,7 @@ class OrderRouter {
     this.router.get("/vp/:buyerId", orderController.getVoucherPoint);
     this.router.delete("/:orderId", orderController.deleteOrder);
     this.router.post("/", verifyUser, verifyBuyer, orderController.createOrder);
+    this.router.get("/inv", orderController.getOrderId);
 
     // this.router.post("/v1", orderController.createOrder);
   }

@@ -50,12 +50,12 @@ export default function Navbar({}: Props) {
       <div className="w-screen px-4 flex justify-between items-center py-3">
         <div className="flex flex-row gap-10">
           {/* LOGO */}
-          <div className="w-[100px] lg:ml-10">
+          <a href="/" className="w-[100px] lg:ml-10">
             <img
-              src="https://i.ibb.co.com/yqxWWt2/Tickzy-2.png"
+              src="https://i.ibb.co.com/cCF1xH7/Tickzy-3.png"
               alt="tickzy logo"
             />
-          </div>
+          </a>
 
           {/* SEARCH */}
           <div className="flex"></div>
@@ -138,13 +138,13 @@ export default function Navbar({}: Props) {
           ) : (
             <React.Fragment>
               <button
-                className=" hover:bg-[#d2dded] hover:rounded-full text-zinc-600 font-base px-4 py-2"
+                className=" hover:bg-[#EEE2DE] hover:rounded-full text-zinc-800 font-semibold px-4 py-2"
                 onClick={loginButton}
               >
                 Login
               </button>
               <button
-                className=" hover:bg-[#d2dded] hover:rounded-full text-zinc-600 font-base px-4 py-2 lg:mr-10"
+                className=" hover:bg-[#EEE2DE] hover:rounded-full text-zinc-800 font-semibold px-4 py-2 lg:mr-10"
                 onClick={registerButton}
               >
                 Sign Up
