@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { axiosInstance } from "@/lib/axios.config";
 import dayjs from "dayjs";
 import { imageSrc } from "@/utils/image.render";
@@ -10,6 +10,7 @@ import {
   IoLocationOutline,
 } from "react-icons/io5";
 import { Console } from "console";
+import { headers } from "next/headers";
 
 interface User {}
 
@@ -86,12 +87,40 @@ function Invoice() {
 
     fetchOrderData();
   }, [id]);
+  // Upload payment Proof
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!file) {
+      setMessage("Please select a file to upload");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("payment_proof", file);
+    try {
+      const response = await axiosInstance().patch(`/orders/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      setMessage(response.data.message);
+      router.push("/success");
+    } catch (error) {
+      setMessage("Failed to upload payment proof. Please try again.");
+    }
+  };
 
   // COUNTDOWN SECTION
   useEffect(() => {
     if (order) {
       const createdAt = dayjs(order.createdAt);
-      const expirationTime = createdAt.add(1, "minute");
+      const expirationTime = createdAt.add(10, "minute");
       const interval = setInterval(() => {
         const now = dayjs();
         const remainingTime = expirationTime.diff(now);
@@ -211,18 +240,20 @@ function Invoice() {
                 <div>
                   Please attach your payment proof to confirm your payment.
                 </div>
-
-                <input
-                  type="file"
-                  className="file-input file-input-bordered w-full max-w-xs"
-                  disabled={countdown === "Expired"}
-                />
-                <button
-                  className="btn btn-dark"
-                  disabled={countdown === "Expired"}
-                >
-                  Submit
-                </button>
+                <form onSubmit={handleSubmit}>
+                  <input
+                    type="file"
+                    className="file-input file-input-bordered w-full max-w-xs"
+                    disabled={countdown === "Expired"}
+                    onChange={handleFileChange}
+                  />
+                  <button
+                    className="btn btn-dark"
+                    disabled={countdown === "Expired"}
+                  >
+                    Submit
+                  </button>
+                </form>
               </div>
             </div>
 

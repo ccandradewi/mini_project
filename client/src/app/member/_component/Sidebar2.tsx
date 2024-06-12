@@ -26,7 +26,9 @@ const Sidebar2 = () => {
     console.log("Navigating to My Ticket");
     router.push(`/member/my-ticket`);
   };
-
+  const handleAccount = () => {
+    router.push("/member/profile");
+  };
   const loggedinUser = useAppSelector((state) => state.auth) as TUser;
 
   return (
@@ -43,7 +45,12 @@ const Sidebar2 = () => {
         <div className="border-t border-gray-700 mb-6"></div>
         <div className="mb-6">
           <p className="text-xs font-semibold px-6 mb-2">Dashboard</p>
-
+          <button
+            className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none"
+            onClick={() => router.push("/")}
+          >
+            <FiGrid className="mr-2" /> Dashboard
+          </button>
           <button
             className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none
         "
@@ -55,7 +62,10 @@ const Sidebar2 = () => {
         <div className="border-t border-gray-700 my-6"></div>
         <div>
           <p className="text-xs font-semibold px-6 mb-2">Profile</p>
-          <button className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none">
+          <button
+            className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none"
+            onClick={handleAccount}
+          >
             <FiUser className="mr-2" /> Account Settings
           </button>
         </div>
