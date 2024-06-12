@@ -159,12 +159,49 @@ class OrderService {
   }
 
   async getOrderBySellerId(req: Request) {
-    const { sellerId } = req.params;
     const data = await prisma.order.findMany({
       where: {
         event: {
-          user_id: sellerId,
+          user_id: req.user?.id,
         },
+      },
+      select: {
+        id: true,
+        buyer_id: true,
+        event_id: true,
+        total_ticket: true,
+        total_price: true,
+        date: true,
+        payment_date: true,
+        payment_method: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        event: {
+          select: {
+            id: true,
+            title: true,
+            city: true,
+            category: true,
+            start_time: true,
+            end_time: true,
+            availability: true,
+            promo: true,
+            start_promo: true,
+            end_promo: true,
+            venue: true,
+            discount_price: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
       },
     });
     return data;

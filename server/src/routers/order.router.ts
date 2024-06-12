@@ -2,7 +2,7 @@ import { Response, Request, NextFunction, Router } from "express";
 // import orderController from "../controllers/order.controller";
 import { verifyUser } from "../middlewares/auth.middleware";
 import orderController from "../controllers/order.controller";
-import { verifyBuyer } from "../middlewares/role.middleware";
+import { verifyBuyer, verifySeller } from "../middlewares/role.middleware";
 import { blobUploader } from "../libs/multer";
 
 class OrderRouter {
@@ -21,7 +21,12 @@ class OrderRouter {
       blobUploader().single("payment_proof"),
       orderController.updateOrder
     );
-    this.router.get("/seller/:sellerId", orderController.getOrderBySellerId);
+    this.router.get(
+      "/seller/myOrder",
+      verifyUser,
+      verifySeller,
+      orderController.getOrderBySellerId
+    );
     this.router.get(
       "/buyer/myTicket",
       verifyUser,
@@ -41,6 +46,12 @@ class OrderRouter {
     this.router.delete("/:orderId", orderController.deleteOrder);
     this.router.post("/", verifyUser, verifyBuyer, orderController.createOrder);
     this.router.get("/inv", orderController.getOrderId);
+    // this.router.get(
+    //   "/dashboard/s",
+    //   verifyUser,
+    //   verifySeller,
+    //   orderController.getSellerDashboardData
+    // );
 
     // this.router.post("/v1", orderController.createOrder);
   }

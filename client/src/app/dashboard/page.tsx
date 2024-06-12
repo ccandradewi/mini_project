@@ -1,9 +1,14 @@
 import React from "react";
+import Metrics from "./_components/Metrics";
+import OrderTable from "./_components/OrderTable";
 
 function page() {
   return (
     <>
-      <div>wkwkwk</div>
+      <div className="flex flex-col gap-8 px-8">
+        <Metrics />
+        <OrderTable />
+      </div>
     </>
   );
 }
