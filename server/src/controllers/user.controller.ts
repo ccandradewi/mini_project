@@ -53,6 +53,12 @@ class UserController {
       next(error);
     }
   }
+  async getUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await userService.userByUserId(req);
+      res.send({ message: "get user data", data });
+    } catch (error) {}
+  }
   async sendChangePassword(req: Request, res: Response, next: NextFunction) {
     try {
       let result = await userService.sendChangePasswordLink(req);

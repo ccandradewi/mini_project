@@ -61,6 +61,23 @@ class UserService {
     };
   }
 
+  async userByUserId(req: Request) {
+    const data = await prisma.user.findUnique({
+      where: { id: req.user?.id },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        username: true,
+        first_name: true,
+        last_name: true,
+        phone_number: true,
+        referral_code: true,
+      },
+    });
+    return data;
+  }
+
   async sendingEmail(
     userId: string,
     userEmail: string,

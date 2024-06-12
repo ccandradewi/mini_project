@@ -73,13 +73,17 @@ function MyTicketCard() {
           {orders.map((order, index) => (
             <div
               key={index}
-              className="flex flex-col flex-wrap gap-10 justify-center"
-              // onClick={() => router.push(`/dashboard/my-event/${event.id}`)}
+              className={`flex flex-col flex-wrap gap-10 justify-center ${
+                order.status === "pending" ? "cursor-pointer" : ""
+              }`}
+              onClick={
+                order.status === "pending"
+                  ? () => router.push(`/invoice/${order.id}`)
+                  : undefined
+              }
+
+              // onClick={() => router.push(`/invoice/${order.id}`)}
             >
-              {/* <div className="font-bold">
-                Total Tickets: {event.total_ticket} | Total Price: IDR{" "}
-                {formatPrice(event.total_price)} | Status: {event.status}
-              </div> */}
               <div className="border w-full flex flex-row justify-between rounded-lg shadow-md overflow-hidden truncate cursor-pointer">
                 <div className="p-4 gap-2 flex flex-col">
                   {order.status === "pending" && (

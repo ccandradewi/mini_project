@@ -31,21 +31,28 @@ export interface Event {
 
 const EventSection: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedCityText, setSelectedCityText] = useState<string>("");
   const [events, setEvents] = useState<Event[]>([]);
   const [query, setQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   // const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   useEffect(() => {
     fetchEventData();
   }, [selectedCity]);
 
   const fetchEventData = async () => {
+    setLoading(true);
+    setError("");
     try {
       const response = await axiosInstance().get("/event");
       const eventData: Event[] = response.data.data;
       setEvents(eventData);
     } catch (error) {
       console.error("Error fetching event data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,15 +60,30 @@ const EventSection: React.FC = () => {
     setSelectedCity(newCity);
   };
   const handleSearch = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const response = await axiosInstance().get("/event/title", {
-        params: {
-          title: query,
-        },
-      });
-      setSearchResults(response.data.data);
+      if (query !== "") {
+        const response = await axiosInstance().get("/event/title", {
+          params: {
+            title: query,
+          },
+        });
+        const results = response.data.data;
+        if (results.length === 0) {
+          setError("No events found for the given title");
+        }
+        setSearchResults(results);
+      } else {
+        setSearchResults([]);
+        fetchEventData();
+      }
     } catch (error) {
-      console.error("Error fetching events:", error);
+      setError(
+        `No events with the searched title '${query}' can be found. Please try again with another title.`
+      );
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -80,9 +102,10 @@ const EventSection: React.FC = () => {
               <select
                 id="city"
                 name="city"
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  handleCityChange(e.target.value)
-                }
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  setSelectedCityText(e.target.selectedOptions[0].innerHTML);
+                  return handleCityChange(e.target.value);
+                }}
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               >
                 <option value="">All Cities</option>
@@ -106,14 +129,18 @@ const EventSection: React.FC = () => {
               setQuery={setQuery}
               handleSearch={handleSearch}
               searchResults={searchResults}
-              // setSelectedEvent={setSelectedEvent}
             />
           </div>
-          <EventCard
-            events={events}
-            selectedCity={selectedCity}
-            searchResults={searchResults}
-          />
+          {loading && <div>Loading events...</div>}
+          {error && <div className="text-red-500">{error}</div>}
+          {!loading && !error && (
+            <EventCard
+              events={events}
+              selectedCity={selectedCity}
+              selectedCityText={selectedCityText}
+              searchResults={searchResults}
+            />
+          )}
         </div>
       </div>
     </div>

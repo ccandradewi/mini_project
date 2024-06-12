@@ -1,4 +1,5 @@
 import { AiOutlineSearch } from "react-icons/ai";
+import { useDebouncedCallback } from "use-debounce";
 interface Event {
   id: string;
   user_id: string;
@@ -24,10 +25,20 @@ interface Event {
 interface SearchBar {
   query: string;
   setQuery: React.Dispatch<React.SetStateAction<string>>;
-  handleSearch: () => void;
+  handleSearch: (query: string) => void;
   searchResults: Event[];
 }
 const SearchBar: React.FC<SearchBar> = ({ query, setQuery, handleSearch }) => {
+  const debouncedSearch = useDebouncedCallback((value) => {
+    handleSearch(value);
+  }, 500);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    debouncedSearch(value);
+  };
+
   return (
     <div>
       <div className="relative flex">
@@ -37,8 +48,8 @@ const SearchBar: React.FC<SearchBar> = ({ query, setQuery, handleSearch }) => {
           aria-label="Search"
           id="exampleFormControlInput"
           aria-describedby="basic-addon1"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          defaultValue={query}
+          onChange={handleInputChange}
           placeholder="Search events by title"
         />
         <button
@@ -47,7 +58,7 @@ const SearchBar: React.FC<SearchBar> = ({ query, setQuery, handleSearch }) => {
           data-twe-ripple-color="white"
           type="button"
           id="button-addon3"
-          onClick={handleSearch}
+          onClick={() => handleSearch(query)}
         >
           <span className="icon">
             <AiOutlineSearch size={20} />
