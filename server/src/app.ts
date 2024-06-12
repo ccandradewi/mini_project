@@ -9,6 +9,7 @@ import express, {
 import userRouter from "./routers/user.router";
 import eventRouter from "./routers/event.router";
 import orderRouter from "./routers/order.router";
+import dashboardRouter from "./routers/dashboard.router";
 
 export class App {
   private app: Application;
@@ -26,6 +27,7 @@ export class App {
     this.app.use("/users", userRouter.getRouter());
     this.app.use("/event", eventRouter.getRouter());
     this.app.use("/orders", orderRouter.getRouter());
+    this.app.use("/dashboard", dashboardRouter.getRouter());
   }
 
   private errorHandler() {
