@@ -21,7 +21,12 @@ class OrderRouter {
       blobUploader().single("payment_proof"),
       orderController.updateOrder
     );
-    this.router.get("/seller/:sellerId", orderController.getOrderBySellerId);
+    this.router.get(
+      "/seller/myOrder",
+      verifyUser,
+      verifySeller,
+      orderController.getOrderBySellerId
+    );
     this.router.get(
       "/buyer/myTicket",
       verifyUser,
