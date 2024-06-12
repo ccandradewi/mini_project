@@ -22,7 +22,9 @@ const Sidebar = () => {
   const handleEvent = () => {
     router.push("/dashboard/my-event");
   };
-
+  const handleAccount = () => {
+    router.push("/dashboard/profile");
+  };
   const loggedinUser = useAppSelector((state) => state.auth) as TUser;
 
   return (
@@ -56,7 +58,10 @@ const Sidebar = () => {
         <div className="border-t border-gray-700 my-6"></div>
         <div>
           <p className="text-xs font-semibold px-6 mb-2">Profile</p>
-          <button className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none">
+          <button
+            className="w-full text-left px-6 py-2 flex items-center hover:bg-gray-700 focus:outline-none"
+            onClick={handleAccount}
+          >
             <FiUser className="mr-2" /> Account Settings
           </button>
         </div>
