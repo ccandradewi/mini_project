@@ -162,7 +162,7 @@ class UserService {
 
       console.log("new user created with reference", newUser);
 
-      if (!referrer) throw new Error("ref code not found");
+      if (!referrer) throw new Error("Invalid referral code");
 
       // check if referrer already exists in voucher point (their referral is used)
       const referrerPoint = await prisma.voucherPoint.findFirst({
