@@ -1,7 +1,8 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 import { IoPricetagOutline } from "react-icons/io5";
-import dayjs from "dayjs"; // Make sure to import dayjs for date formatting
+import dayjs from "dayjs";
+import Swal from "sweetalert2";
 
 interface TicketCardProps {
   title?: string;
@@ -10,6 +11,7 @@ interface TicketCardProps {
   id?: string;
   endPromo?: string;
   type?: string;
+  endTime?: string;
 }
 
 const TicketCard: React.FC<TicketCardProps> = ({
@@ -19,17 +21,26 @@ const TicketCard: React.FC<TicketCardProps> = ({
   id,
   endPromo,
   type,
+  endTime,
 }) => {
   const router = useRouter();
 
-  const handleBuyTickets = () => {
-    if (id) {
-      router.push(`/checkout/${id}`);
-    }
-  };
-
   const formatPrice = (price: number) => {
     return `Rp ${price.toLocaleString("id-ID")}`;
+  };
+
+  const handleBuyTickets = () => {
+    if (endTime && new Date() > new Date(endTime)) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops... event has started",
+        text: "Ticket sale has already ended!",
+      });
+    } else {
+      if (id) {
+        router.push(`/checkout/${id}`);
+      }
+    }
   };
 
   return (
@@ -39,7 +50,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
         <IoPricetagOutline className="mr-1" />
         {type === "FREE" ? (
           <span>FREE</span>
-        ) : discountPrice ? (
+        ) : discountPrice && endPromo && new Date() <= new Date(endPromo) ? (
           <>
             <span className="line-through mr-2">
               {price !== undefined ? formatPrice(price) : "N/A"}

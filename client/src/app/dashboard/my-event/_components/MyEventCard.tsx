@@ -47,6 +47,8 @@ function MyEventCard() {
     }
   };
 
+  const today = dayjs();
+
   const formatPrice = (price: number) => {
     return price.toLocaleString("en-ID");
   };
@@ -77,17 +79,20 @@ function MyEventCard() {
                       <IoLocationOutline /> {event.venue}
                     </div>
                   </div>
-
                   <div className="font-bold">
-                    {event.promo && event.discount_price !== undefined ? (
+                    {today.isAfter(dayjs(event.end_promo)) ? (
+                      event.ticket_price === 0 ? (
+                        "FREE"
+                      ) : (
+                        `IDR ${formatPrice(event.ticket_price)}`
+                      )
+                    ) : event.promo && event.discount_price !== undefined ? (
                       <div>
                         <span className="line-through mr-2">
                           IDR {formatPrice(event.ticket_price)}
                         </span>
                         <span>IDR {formatPrice(event.discount_price)}</span>
                       </div>
-                    ) : event.ticket_price === 0 ? (
-                      "FREE"
                     ) : (
                       `IDR ${formatPrice(event.ticket_price)}`
                     )}
@@ -99,7 +104,6 @@ function MyEventCard() {
                       <span className="font-bold"> {event.availability} </span>
                     </div>
                   </div>
-
                   {event.promo && (
                     <div className="text-sm">
                       Promo period:
@@ -116,7 +120,6 @@ function MyEventCard() {
                     Posted on{" "}
                     <b>{dayjs(event.createdAt).format("DD MMMM YYYY")}</b>
                   </div>
-
                   <div className="text-sm">
                     Last edited on{" "}
                     <b>{dayjs(event.updatedAt).format("DD MMMM YYYY")}</b>

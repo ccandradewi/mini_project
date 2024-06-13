@@ -109,6 +109,7 @@ function EventDetails() {
                 id={event?.id}
                 endPromo={event?.end_promo}
                 type={event?.type}
+                endTime={event?.end_time}
               />
             </div>
           </div>
