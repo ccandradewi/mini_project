@@ -488,7 +488,7 @@ class OrderService {
           }
         }
       }
-    }, 1 * 15 * 1000);
+    }, 10 * 60 * 1000);
 
     return order;
   }
