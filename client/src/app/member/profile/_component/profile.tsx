@@ -2,7 +2,7 @@
 import { axiosInstance } from "@/lib/axios.config";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import Swal from "sweetalert2";
 interface User {
   id: string;
   email: string;
@@ -17,10 +17,13 @@ function Profile() {
   const router = useRouter();
   const copyToClipboard = () => {
     const inputElement = document.getElementById("refcode") as HTMLInputElement; // Get the input element
+    console.log("test:", inputElement);
     if (inputElement) {
+      console.log("test 2");
       inputElement.select(); // Select the input element's value
       document.execCommand("copy"); // Execute the copy command
-      alert("Referral code copied to clipboard!"); // Show a success message
+      Swal.fire("Successfully copied referral code!");
+      // alert("Referral code copied to clipboard!"); // Show a success message
     }
   };
   const [user, setUser] = useState<User | null>(null);
@@ -81,9 +84,14 @@ function Profile() {
               Referral Code
             </dt>
             <dd className="mt-1 text-medium font-semibold text-gray-900 sm:mt-0 sm:col-span-2">
-              {user?.referral_code}
+              <input
+                type="text"
+                defaultValue={user?.referral_code}
+                id="refcode"
+                readOnly
+              />
               <div className="mt-4 text-gray-700">
-                <p className=" font-semibold text-blue-600">
+                <p className=" font-semibold text-black">
                   Share your referral code with friends and get 10.000 point!
                 </p>
               </div>

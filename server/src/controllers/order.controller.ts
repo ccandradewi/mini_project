@@ -151,6 +151,17 @@ class OrderController {
       next(error);
     }
   }
+  async getTicket(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await orderService.getTicket(req);
+      return res.send({
+        message: "get e-ticket",
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new OrderController();
