@@ -31,6 +31,7 @@ function OrderTable() {
   const [usernameFilter, setUsernameFilter] = useState("");
   const [eventTitleFilter, setEventTitleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [invoiceFilter, setInvoiceFilter] = useState("");
 
   const fetchOrderData = async () => {
     try {
@@ -50,7 +51,7 @@ function OrderTable() {
 
   useEffect(() => {
     filterOrders();
-  }, [usernameFilter, eventTitleFilter, statusFilter]);
+  }, [usernameFilter, eventTitleFilter, statusFilter, invoiceFilter]);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
@@ -68,8 +69,11 @@ function OrderTable() {
       const statusMatch = order.status
         .toLowerCase()
         .includes(statusFilter.toLowerCase());
+      const invoiceMatch = order.inv_id
+        .toLowerCase()
+        .includes(invoiceFilter.toLowerCase());
 
-      return usernameMatch && eventTitleMatch && statusMatch;
+      return usernameMatch && eventTitleMatch && statusMatch && invoiceMatch;
     });
 
     setFilteredOrders(filtered);
@@ -111,6 +115,18 @@ function OrderTable() {
             placeholder="Input status..."
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border rounded mr-2 text-sm"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="" className="text-sm font-semibold mb-2">
+            Filter by invoice
+          </label>
+          <input
+            type="text"
+            placeholder="Input invoice ID..."
+            value={invoiceFilter}
+            onChange={(e) => setInvoiceFilter(e.target.value)}
             className="px-4 py-2 border rounded text-sm"
           />
         </div>
