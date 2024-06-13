@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { IoLocationOutline, IoCalendarOutline } from "react-icons/io5";
-import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { axiosInstance } from "@/lib/axios.config";
 import dayjs from "dayjs";
 import { imageSrc } from "@/utils/image.render";
@@ -43,18 +42,19 @@ interface Order {
 
 function MyTicketCard() {
   const router = useRouter();
-
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchOrderData = async () => {
     try {
       const response = await axiosInstance().get("/orders/buyer/myTicket");
       console.log("Response data:", response.data);
       const orders: Order[] = response.data.data;
-      // const eventList = orders.map((order) => order.event);
       setOrders(orders);
     } catch (error) {
       console.error("Error fetching event data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,8 +67,12 @@ function MyTicketCard() {
   }, []);
 
   return (
-    <>
-      <div className="py-10 px-6">
+    <div className="py-10 px-6">
+      {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <span className="loading loading-dots loading-lg"></span>
+        </div>
+      ) : (
         <div className="flex flex-col gap-8">
           {orders.map((order, index) => (
             <div
@@ -81,8 +85,6 @@ function MyTicketCard() {
                   ? () => router.push(`/invoice/${order.id}`)
                   : undefined
               }
-
-              // onClick={() => router.push(`/invoice/${order.id}`)}
             >
               <div className="border w-full flex flex-row justify-between rounded-lg shadow-md overflow-hidden truncate cursor-pointer">
                 <div className="p-4 gap-2 flex flex-col">
@@ -137,8 +139,8 @@ function MyTicketCard() {
             </div>
           ))}
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
 
