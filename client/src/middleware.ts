@@ -50,6 +50,9 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(new URL("/", request.url));
     }
+    if (pathname.startsWith("/checkout")) {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
     return response;
   }
   if (pathname == "/" && validate && is_verified && !isBuyer) {
@@ -85,6 +88,11 @@ export async function middleware(request: NextRequest) {
       pathname.startsWith("/member"))
   ) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+  if (!token && pathname.startsWith("/checkout")) {
+    {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
   }
   return response;
 }
