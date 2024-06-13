@@ -75,6 +75,17 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.redirect(new URL("/", request.url));
   }
+  if (
+    validate &&
+    !isBuyer &&
+    (pathname.startsWith("/checkout") ||
+      pathname.startsWith("/invoice") ||
+      pathname.startsWith("/event") ||
+      pathname.startsWith("/success") ||
+      pathname.startsWith("/member"))
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
   return response;
 }
 
@@ -115,5 +126,15 @@ export async function middleware(request: NextRequest) {
 // };
 
 export const config = {
-  matcher: ["/", "/auth/:path*", "/verification", "/dashboard/:path*"],
+  matcher: [
+    "/",
+    "/auth/:path*",
+    "/verification",
+    "/dashboard/:path*",
+    "/checkout/:path*",
+    "/invoice/:path*",
+    "/event/:path*",
+    "/success",
+    "/member/:path*",
+  ],
 };
