@@ -48,8 +48,8 @@ const PasswordResetForm = () => {
   });
   return (
     <>
-      <div className="bg-light py-3 py-md-5">
-        <div className="container">
+      <div className="bg-zinc-100 h-screen">
+        <div className="container flex justify-center  h-screen items-center">
           <div className="row justify-content-md-center">
             <div className="col-12 col-md-11 col-lg-8 col-xl-7 col-xxl-6">
               <div className="bg-white p-4 p-md-5 rounded shadow-sm ">
@@ -108,7 +108,7 @@ const PasswordResetForm = () => {
                     <div className="col-12">
                       <div className="d-grid">
                         <button
-                          className="btn btn-primary btn-lg"
+                          className="btn btn-dark btn-lg"
                           type="submit"
                           disabled={!formik.values.email}
                         >
