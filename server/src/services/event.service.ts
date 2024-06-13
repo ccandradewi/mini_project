@@ -58,6 +58,9 @@ class EventService {
       where: {
         user_id: req.user?.id,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
       select: {
         id: true,
         banner: true,
@@ -80,6 +83,7 @@ class EventService {
     });
     return data;
   }
+
   async getByfilter(req: Request) {
     const { city, category } = req.query;
     let filter: any = {};
