@@ -180,6 +180,7 @@ class OrderService {
         status: true,
         createdAt: true,
         updatedAt: true,
+        inv_id: true,
         event: {
           select: {
             id: true,
@@ -487,7 +488,7 @@ class OrderService {
           }
         }
       }
-    }, 1 * 15 * 1000);
+    }, 10 * 60 * 1000);
 
     return order;
   }

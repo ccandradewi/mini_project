@@ -114,24 +114,24 @@ function Metrics() {
 
   return (
     <div>
-      <div className="flex flex-row justify-center items-center gap-8">
+      <div className="flex flex-row justify-center items-center gap-8 px-10">
         {/* CHART */}
-        <div className="border rounded-lg h-full w-2/3 px-2">
+        <div className="border rounded-lg h-full w-3/4 px-2 py-8">
           <EventChart data={metricData.ticketsAndRevenuePerEvent} />
         </div>
 
         {/* ANGKA TOTAL */}
-        <div className="flex flex-col w-1/3 h-full gap-8">
+        <div className="flex flex-col w-1/4 h-full gap-8 ">
           {metrics.map((metric) => (
             <div
               key={metric.id}
               className="flex flex-col border rounded-lg px-4 items-start py-3 w-60"
             >
-              <div className="mb-[30px] text-lg rounded-full bg-zinc-300 p-2 text-[#4f4e75]">
+              <div className="mb-7 text-lg rounded-full bg-zinc-300 p-2 text-[#4f4e75]">
                 {metric.icon}
               </div>
               <div className="text-xs">{metric.label}</div>
-              <div className="font-bold text-2xl text-[#4f4e75]">
+              <div className="font-bold text-xl text-[#4f4e75]">
                 {metric.value}
               </div>
             </div>
