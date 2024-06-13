@@ -3,14 +3,20 @@ import Invoice from "./components/Invoice";
 import Navbar from "@/app/components/navbar";
 import Footer from "@/app/components/Footer";
 
-function page() {
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+function Page({ params: { id } }: PageProps) {
   return (
     <>
       <Navbar />
-      <Invoice />
+      <Invoice id={id} />
       <Footer />
     </>
   );
 }
 
-export default page;
+export default Page;
