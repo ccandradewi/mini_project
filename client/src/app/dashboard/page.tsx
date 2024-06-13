@@ -7,6 +7,7 @@ function page() {
     <>
       <div className="flex flex-col gap-8 px-8">
         <Metrics />
+        <div className="border-b" />
         <OrderTable />
       </div>
     </>

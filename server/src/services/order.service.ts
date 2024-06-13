@@ -180,6 +180,7 @@ class OrderService {
         status: true,
         createdAt: true,
         updatedAt: true,
+        inv_id: true,
         event: {
           select: {
             id: true,
