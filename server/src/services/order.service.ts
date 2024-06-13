@@ -421,25 +421,70 @@ class OrderService {
         where: { id: order.id },
       });
       if (expireOrder && expireOrder.status === "pending") {
+        // Cancel the order
         await prisma.order.update({
           where: { id: expireOrder.id },
           data: { status: "cancelled" },
         });
 
-        const event = await prisma.event.findUnique({
-          where: { id: expireOrder.event_id },
-        });
-
-        if (event) {
-          await prisma.event.update({
-            where: { id: event.id },
-            data: {
-              availability: event.availability + expireOrder.total_ticket,
-            },
+        // Refund points if they were used
+        if (
+          expireOrder &&
+          expireOrder.status === "pending" &&
+          req.body.use_point === true
+        ) {
+          // Get event details
+          const event = await prisma.event.findUnique({
+            where: { id: expireOrder.event_id },
           });
+
+          if (event) {
+            const pointData = await prisma.voucherPoint.findFirst({
+              where: { user_id: expireOrder.buyer_id },
+            });
+
+            if (pointData) {
+              // Calculate the points to refund
+              const pointsUsed =
+                expireOrder.total_ticket * (event.ticket_price || 0);
+              const newPointBalance = pointData.point + pointsUsed;
+
+              // Update the user's point balance
+              await prisma.voucherPoint.update({
+                where: { id: pointData.id },
+                data: { point: newPointBalance },
+              });
+            }
+          }
+        }
+
+        if (
+          expireOrder &&
+          expireOrder.status === "pending" &&
+          req.body.use_voucher === true
+        ) {
+          // Get event details
+          const event = await prisma.event.findUnique({
+            where: { id: expireOrder.event_id },
+          });
+
+          if (event) {
+            const pointData = await prisma.voucherPoint.findFirst({
+              where: { user_id: expireOrder.buyer_id },
+            });
+
+            // Update the user's point balance
+            await prisma.voucherPoint.update({
+              where: { id: pointData?.id },
+              data: {
+                voucher: 0.1,
+                isValid: true,
+              },
+            });
+          }
         }
       }
-    }, 1 * 60 * 1000);
+    }, 1 * 15 * 1000);
 
     return order;
   }
