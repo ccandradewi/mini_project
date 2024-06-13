@@ -1,5 +1,5 @@
-"use client";
-import { useRouter, useParams } from "next/navigation";
+// "use client";
+import { useRouter, useParams, redirect } from "next/navigation";
 import { useState, useEffect, ChangeEvent } from "react";
 import { axiosInstance } from "@/lib/axios.config";
 import dayjs from "dayjs";
@@ -9,8 +9,14 @@ import {
   IoCalendarOutline,
   IoLocationOutline,
 } from "react-icons/io5";
-import { Console } from "console";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { AxiosError } from "axios";
+import FormPaymentProofComponent, {
+  CountComponent,
+  Order,
+} from "./count.component";
+import { jwtDecode } from "jwt-decode";
+import { TUser } from "@/models/user.model";
 
 interface User {}
 
@@ -32,23 +38,6 @@ interface Event {
   type: string;
 }
 
-interface Order {
-  id: string;
-  buyer_id: string;
-  event_id: string;
-  total_ticket: number;
-  total_price: number;
-  payment_method: string;
-  payment_proof: string;
-  date: string;
-  payment_date: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  inv_id: string;
-  event: Event;
-}
-
 const paymentMethodMap: { [key: string]: string } = {
   bank: "BCA Transfer",
   virtualaccount: "Virtual Account",
@@ -56,104 +45,49 @@ const paymentMethodMap: { [key: string]: string } = {
   gopay: "GoPay",
 };
 
-function Invoice() {
-  const router = useRouter();
-  const params = useParams();
-  const { id } = params;
+async function Invoice({ id }: { id: string }) {
+  // const params = useParams();
+  // const { id } = params;
 
-  const [order, setOrder] = useState<Order | null>(null);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-  const [message, setMessage] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [countdown, setCountdown] = useState<string | null>("");
+  // const [order, setOrder] = useState<Order | null>(null);
 
-  useEffect(() => {
-    console.log("cobaaaaaaa");
-    const fetchOrderData = async () => {
-      try {
-        if (!id) return;
+  // const [countdown, setCountdown] = useState<string | null>("");
+  // const fetchOrderData = async () => {
+  //   try {
+  //     if (!id) return;
 
-        const response = await axiosInstance().get(`/orders/${id}`);
-        const { data } = response.data;
-        console.log("respons", response);
-        console.log(data.event.title);
-        setOrder(data);
-        console.log("Order data:", data);
-      } catch (error) {
-        console.error("Error fetching order data:", error);
-      }
-    };
+  //     const response = await axiosInstance().get(`/orders/${id}`);
+  //     const { data } = response.data;
+  //     console.log("respons", response);
+  //     console.log(data.event.title);
+  //     // setOrder(data);
+  //     console.log("Order data:", data);
+  //   } catch (error) {
+  //     console.error("Error fetching order data:", error);
+  //   }
+  // };
 
-    fetchOrderData();
-  }, [id]);
+  const order: Order = await axiosInstance()
+    .get(`/orders/${id}`)
+    .then((res) => res.data.data)
+    .catch((e) => {
+      if (e instanceof AxiosError) console.log(e.response?.data);
+      return undefined;
+    });
+
+  const user = jwtDecode(cookies().get("access_token")?.value!) as TUser;
+  if (order.buyer_id != user.id) redirect("/");
+
+  // useEffect(() => {
+  //   console.log("cobaaaaaaa");
+
+  //   fetchOrderData();
+  // }, [id]);
   // Upload payment Proof
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!file) {
-      setMessage("Please select a file to upload");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("payment_proof", file);
-    try {
-      const response = await axiosInstance().patch(`/orders/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setMessage(response.data.message);
-      router.push("/success");
-    } catch (error) {
-      setMessage("Failed to upload payment proof. Please try again.");
-    }
-  };
-
-  // COUNTDOWN SECTION
-  useEffect(() => {
-    if (order) {
-      const createdAt = dayjs(order.createdAt);
-      const expirationTime = createdAt.add(10, "minute");
-      const interval = setInterval(() => {
-        const now = dayjs();
-        const remainingTime = expirationTime.diff(now);
-        if (remainingTime <= 0) {
-          clearInterval(interval);
-          setCountdown("Expired");
-          setMessage(
-            "Your order has been cancelled. You have exceeded the payment deadline."
-          );
-        } else {
-          const minutes = Math.floor(remainingTime / 60000);
-          const seconds = Math.floor((remainingTime % 60000) / 1000);
-          setMinutes(minutes);
-          setSeconds(seconds);
-        }
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [order]);
 
   const paymentMethod =
     paymentMethodMap[order?.payment_method as keyof typeof paymentMethodMap] ||
     order?.payment_method;
-
-  const calculateExpiration = () => {
-    if (!order) return "";
-    const creationDate = dayjs(order.createdAt);
-    const expirationDate = creationDate.add(10, "minute");
-    return expirationDate.format("h:mm A [on] DD MMMM YYYY");
-  };
-
-  const expirationTime = order ? calculateExpiration() : "";
 
   return (
     <>
@@ -161,46 +95,9 @@ function Invoice() {
         <div className="px-10">
           <div className="flex flex-row gap-4 lg:p-10">
             {/* SECTION PEMBAYARAN */}
-
             <div className="flex flex-col w-1/3 justify-center border p-4 rounded-xl gap-2 shadow-md">
-              {minutes > 0 || seconds > 0 ? (
-                <>
-                  <div>
-                    Complete your payment before{" "}
-                    <span className="font-semibold">{expirationTime}</span>
-                  </div>
-                  <div className="flex flex-row justify-center pt-2">
-                    <div className="flex flex-col border px-4 py-2 rounded-xl gap-1">
-                      <div className="countdown font-bold text-2xl flex flex-row gap-2 text-[#666699]">
-                        <span
-                          style={{ "--value": minutes } as React.CSSProperties}
-                        ></span>
-                        :{" "}
-                        <span
-                          style={{ "--value": seconds } as React.CSSProperties}
-                        ></span>
-                      </div>
-                      <div className="flex flex-row justify-center gap-4 text-xs">
-                        <div className="">menit</div>
-                        <div className="">detik</div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col justify center items-center">
-                  <div className="py-4">
-                    <img
-                      src="https://www.loket.com/assets-v2/img/spot-hero-wrong-pin-attempts.svg"
-                      alt=""
-                    />
-                  </div>
-                  <span className="text-lg font-bold">
-                    Your order has been cancelled.
-                  </span>
-                  <div>You have exceeded the payment deadline.</div>
-                </div>
-              )}
+              <CountComponent order={order} />
+
               <div>
                 <div className="flex flex-row justify-between">
                   <div className="flex flex-col pt-4 flex-start">
@@ -240,20 +137,8 @@ function Invoice() {
                 <div>
                   Please attach your payment proof to confirm your payment.
                 </div>
-                <form onSubmit={handleSubmit}>
-                  <input
-                    type="file"
-                    className="file-input file-input-bordered w-full max-w-xs"
-                    disabled={countdown === "Expired"}
-                    onChange={handleFileChange}
-                  />
-                  <button
-                    className="btn btn-dark"
-                    disabled={countdown === "Expired"}
-                  >
-                    Submit
-                  </button>
-                </form>
+                {/* isi form */}
+                <FormPaymentProofComponent order={order} />
               </div>
             </div>
 
