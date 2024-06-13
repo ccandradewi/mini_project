@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect } from "react";
 import YupPassword from "yup-password";
 import * as Yup from "yup";
@@ -8,6 +7,7 @@ import Link from "next/link";
 import { TUser } from "@/models/user.model";
 import { useRouter } from "next/navigation";
 import { AxiosError } from "axios";
+import Swal from "sweetalert2";
 
 const Register = () => {
   const router = useRouter();
@@ -44,11 +44,29 @@ const Register = () => {
         console.log("masuk");
         await axiosInstance().post("/users/v1", values);
         router.push("/verification");
-        // alert(data.message);
-        //alert bisa custom pake shadcn atau sweetalert
+        Swal.fire({
+          title: "Registration success!",
+          text: "Your account has been created.",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
       } catch (error) {
         console.log(error);
-        if (error instanceof AxiosError) alert(error.response?.data.message);
+        if (error instanceof AxiosError) {
+          Swal.fire({
+            title: "Oops...",
+            text: error.response?.data.message,
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        } else {
+          Swal.fire({
+            title: "Error!",
+            text: "An unexpected error occurred.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        }
       }
     },
   });
