@@ -26,7 +26,7 @@ export default function RootLayout({
       </Head> */}
 
       <html lang="en">
-        <body>
+        <body className=" overflow-x-hidden">
           <main>
             <StoreProvider>{children}</StoreProvider>
           </main>

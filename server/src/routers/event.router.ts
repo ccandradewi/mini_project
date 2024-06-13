@@ -52,6 +52,15 @@ class EventRouter {
       eventController.deleteEvent
     );
     this.router.get("/image/:id", eventController.renderBanner);
+    this.router.post("/addReview", eventController.addReview);
+    this.router.get(
+      "/getReviewByEventId/:eventId",
+      eventController.getReviewByEventId
+    );
+    this.router.get(
+      "/getReviewByUserId/:userId",
+      eventController.getReviewByUserId
+    );
   }
   getRouter() {
     return this.router;

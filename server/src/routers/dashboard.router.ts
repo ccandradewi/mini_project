@@ -18,15 +18,6 @@ class DashboardRouter {
       verifySeller,
       dashboardController.getSellerDashboardMetric
     );
-    this.router.post("/addReview", dashboardController.addReview);
-    this.router.get(
-      "/getReviewByEventId/:eventId",
-      dashboardController.getReviewByEventId
-    );
-    this.router.get(
-      "/getReviewByUserId/:userId",
-      dashboardController.getReviewByUserId
-    );
   }
 
   getRouter() {

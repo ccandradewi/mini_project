@@ -49,12 +49,7 @@ const EventSection: React.FC = () => {
       const response = await axiosInstance().get("/event");
       const eventData: Event[] = response.data.data;
 
-      // Filter out events that have already started
-      const futureEvents = eventData.filter(
-        (event) => new Date(event.start_time) > new Date()
-      );
-
-      setEvents(futureEvents);
+      setEvents(eventData);
     } catch (error) {
       console.error("Error fetching event data:", error);
     } finally {
