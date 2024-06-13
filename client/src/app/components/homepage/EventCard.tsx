@@ -54,7 +54,7 @@ const EventCard: React.FC<EventCardProps> = ({
         const response = await axiosInstance().get(
           `/event/f?city=${selectedCity}`
         );
-        console.log("Filtered Events Data:", response.data); // Log filtered events data
+        console.log("Filtered Events Data:", response.data);
         const { data } = response.data;
         setFilteredEvents(data);
       } catch (error) {
@@ -69,6 +69,10 @@ const EventCard: React.FC<EventCardProps> = ({
       setFilteredEvents(events);
     }
   }, [selectedCity, events]);
+
+  const formatPrice = (price: number) => {
+    return `Rp ${price.toLocaleString("id-ID")}`;
+  };
 
   const redirectToEvent = (id: string) => {
     router.push(`/event/${id}`);
@@ -101,15 +105,15 @@ const EventCard: React.FC<EventCardProps> = ({
                 </div>
                 <div>{event.venue}</div>
                 <div className="font-bold">
-                  {event.promo &&
-                  event.discount_price !== undefined &&
+                  {event.discount_price &&
+                  event.end_promo &&
                   new Date() <= new Date(event.end_promo) ? (
                     <div>
                       <span className="line-through mr-2">
                         IDR {event.ticket_price.toLocaleString("en-ID")}
                       </span>
                       <span>
-                        IDR {event.discount_price.toLocaleString("en-ID")}
+                        IDR {event?.discount_price.toLocaleString("en-ID")}
                       </span>
                     </div>
                   ) : event.ticket_price === 0 ? (

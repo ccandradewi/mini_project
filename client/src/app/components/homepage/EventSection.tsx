@@ -37,7 +37,7 @@ const EventSection: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  // const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
   useEffect(() => {
     fetchEventData();
   }, [selectedCity]);
@@ -48,7 +48,13 @@ const EventSection: React.FC = () => {
     try {
       const response = await axiosInstance().get("/event");
       const eventData: Event[] = response.data.data;
-      setEvents(eventData);
+
+      // Filter out events that have already started
+      const futureEvents = eventData.filter(
+        (event) => new Date(event.start_time) > new Date()
+      );
+
+      setEvents(futureEvents);
     } catch (error) {
       console.error("Error fetching event data:", error);
     } finally {
@@ -59,6 +65,7 @@ const EventSection: React.FC = () => {
   const handleCityChange = (newCity: string) => {
     setSelectedCity(newCity);
   };
+
   const handleSearch = async () => {
     setLoading(true);
     setError("");
@@ -69,11 +76,17 @@ const EventSection: React.FC = () => {
             title: query,
           },
         });
-        const results = response.data.data;
-        if (results.length === 0) {
+        const results: Event[] = response.data.data;
+
+        // Filter out events that have already started
+        const futureSearchResults = results.filter(
+          (event) => new Date(event.start_time) > new Date()
+        );
+
+        if (futureSearchResults.length === 0) {
           setError("No events found for the given title");
         }
-        setSearchResults(results);
+        setSearchResults(futureSearchResults);
       } else {
         setSearchResults([]);
         fetchEventData();
@@ -86,6 +99,7 @@ const EventSection: React.FC = () => {
       setLoading(false);
     }
   };
+
   return (
     <div>
       <div className="flex flex-row py-4">

@@ -107,10 +107,16 @@ function DetailCheckouts() {
   };
 
   const discountPrice = event?.discount_price ?? 0;
-  const ticketPrice = event?.promo ? discountPrice : event?.ticket_price ?? 0;
-  const subtotal = event?.promo
-    ? ticketCount * (event.discount_price ?? 0)
-    : ticketCount * ticketPrice;
+  const ticketPrice =
+    event?.promo && new Date() <= new Date(event.end_promo)
+      ? discountPrice
+      : event?.ticket_price ?? 0;
+  const subtotal =
+    event?.promo && event.end_promo && new Date() <= new Date(event.end_promo)
+      ? ticketCount * (event?.discount_price ?? 0)
+      : ticketCount * ticketPrice;
+
+  console.log(subtotal);
 
   const handlePaymentMethodChange = (
     e: React.ChangeEvent<HTMLSelectElement>
