@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "@/lib/axios.config";
 import dayjs from "dayjs";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 
 interface Order {
   id: string;
@@ -28,8 +27,10 @@ interface Order {
 
 function OrderTable() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [sortColumn, setSortColumn] = useState<keyof Order>("id");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  const [usernameFilter, setUsernameFilter] = useState("");
+  const [eventTitleFilter, setEventTitleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const fetchOrderData = async () => {
     try {
@@ -37,6 +38,7 @@ function OrderTable() {
       const ordersData: Order[] = response.data.data;
 
       setOrders(ordersData);
+      setFilteredOrders(ordersData);
     } catch (error) {
       console.error("Error fetching order data:", error);
     }
@@ -46,185 +48,133 @@ function OrderTable() {
     fetchOrderData();
   }, []);
 
+  useEffect(() => {
+    filterOrders();
+  }, [usernameFilter, eventTitleFilter, statusFilter]);
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
     return dayjs(dateString).format("DD/MM/YY HH:mm");
   };
 
-  const handleSort = (column: keyof Order) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc");
-    }
+  const filterOrders = () => {
+    const filtered = orders.filter((order) => {
+      const usernameMatch = order.user.username
+        .toLowerCase()
+        .includes(usernameFilter.toLowerCase());
+      const eventTitleMatch = order.event.title
+        .toLowerCase()
+        .includes(eventTitleFilter.toLowerCase());
+      const statusMatch = order.status
+        .toLowerCase()
+        .includes(statusFilter.toLowerCase());
+
+      return usernameMatch && eventTitleMatch && statusMatch;
+    });
+
+    setFilteredOrders(filtered);
   };
 
   return (
-    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-      <thead className="text-xs text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-        <tr>
-          <th
-            scope="col"
-            className="px-6 py-3 cursor-pointer"
-            onClick={() => handleSort("id")}
-          >
-            <span style={{ display: "inline-block" }}>ID No </span>
-            <span style={{ display: "inline-block" }}>
-              {sortColumn === "id" ? (
-                sortDirection === "asc" ? (
-                  <FaSortUp />
-                ) : (
-                  <FaSortDown />
-                )
-              ) : (
-                <FaSort />
-              )}
-            </span>
-          </th>
-          <th
-            scope="col"
-            className="px-6 py-3 cursor-pointer"
-            onClick={() => handleSort("buyer_id")}
-          >
-            <span style={{ display: "inline-block" }}>Username </span>
-            <span style={{ display: "inline-block" }}>
-              {sortColumn === "buyer_id" ? (
-                sortDirection === "asc" ? (
-                  <FaSortUp />
-                ) : (
-                  <FaSortDown />
-                )
-              ) : (
-                <FaSort />
-              )}
-            </span>
-          </th>
-          <th
-            scope="col"
-            className="px-6 py-3 cursor-pointer"
-            onClick={() => handleSort("event")}
-          >
-            <span style={{ display: "inline-block" }}>Event Title </span>
-            <span style={{ display: "inline-block" }}>
-              {sortColumn === "event" ? (
-                sortDirection === "asc" ? (
-                  <FaSortUp />
-                ) : (
-                  <FaSortDown />
-                )
-              ) : (
-                <FaSort />
-              )}
-            </span>
-          </th>
-          <th
-            scope="col"
-            className="px-6 py-3 cursor-pointer"
-            onClick={() => handleSort("total_ticket")}
-          >
-            <span style={{ display: "inline-block" }}>Total Tickets </span>
-            <span style={{ display: "inline-block" }}>
-              {sortColumn === "total_ticket" ? (
-                sortDirection === "asc" ? (
-                  <FaSortUp />
-                ) : (
-                  <FaSortDown />
-                )
-              ) : (
-                <FaSort />
-              )}
-            </span>
-          </th>
-          <th
-            scope="col"
-            className="px-6 py-3 cursor-pointer"
-            onClick={() => handleSort("createdAt")}
-          >
-            <span style={{ display: "inline-block" }}>Order Date </span>
-            <span style={{ display: "inline-block" }}>
-              {sortColumn === "createdAt" ? (
-                sortDirection === "asc" ? (
-                  <FaSortUp />
-                ) : (
-                  <FaSortDown />
-                )
-              ) : (
-                <FaSort />
-              )}
-            </span>
-          </th>
-          <th
-            scope="col"
-            className="px-6 py-3 cursor-pointer"
-            onClick={() => handleSort("payment_date")}
-          >
-            <span style={{ display: "inline-block" }}>Payment Date </span>
-            <span style={{ display: "inline-block" }}>
-              {sortColumn === "payment_date" ? (
-                sortDirection === "asc" ? (
-                  <FaSortUp />
-                ) : (
-                  <FaSortDown />
-                )
-              ) : (
-                <FaSort />
-              )}
-            </span>
-          </th>
-          <th
-            scope="col"
-            className="px-6 py-3 cursor-pointer"
-            onClick={() => handleSort("status")}
-          >
-            <span style={{ display: "inline-block" }}>Status </span>
-            <span style={{ display: "inline-block" }}>
-              {sortColumn === "status" ? (
-                sortDirection === "asc" ? (
-                  <FaSortUp />
-                ) : (
-                  <FaSortDown />
-                )
-              ) : (
-                <FaSort />
-              )}
-            </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((order) => (
-          <tr
-            key={order.id}
-            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 "
-          >
-            <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              {order.id}
-            </td>
-            <td className="px-6 py-4 text-center">{order.user.username}</td>
-            <td className="px-6 py-4 text-center">{order.event.title}</td>
-            <td className="px-6 py-4 text-center">{order.total_ticket}</td>
-            <td className="px-6 py-4 text-center">
-              {formatDate(order.createdAt)}
-            </td>
-            <td className="px-6 py-4 text-center">
-              {formatDate(order.payment_date)}
-            </td>
-            <td
-              className={`px-6 py-4 uppercase text-center ${
-                order.status === "confirmed"
-                  ? "text-[#5D9B76] font-semibold"
-                  : order.status === "pending"
-                  ? "text-yellow-400"
-                  : "text-red-700"
-              }`}
-            >
-              {order.status}
-            </td>
+    <div>
+      <div className="flex mb-4">
+        <div className="flex flex-col">
+          <label htmlFor="" className="text-sm font-semibold mb-2">
+            Filter by buyer
+          </label>
+          <input
+            type="text"
+            placeholder="Input username..."
+            value={usernameFilter}
+            onChange={(e) => setUsernameFilter(e.target.value)}
+            className="px-4 py-2 border rounded mr-2 text-sm"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="" className="text-sm font-semibold mb-2">
+            Filter by event
+          </label>
+          <input
+            type="text"
+            placeholder="Input event..."
+            value={eventTitleFilter}
+            onChange={(e) => setEventTitleFilter(e.target.value)}
+            className="px-4 py-2 border rounded mr-2 text-sm"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="" className="text-sm font-semibold mb-2">
+            Filter by order status
+          </label>
+          <input
+            type="text"
+            placeholder="Input status..."
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border rounded text-sm"
+          />
+        </div>
+      </div>
+      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-sm text-center text-gray-700  bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" className="px-6 py-3">
+              Invoice
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Username
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Event
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Tickets
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Order Date
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Payment Date
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Status
+            </th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {filteredOrders.map((order) => (
+            <tr
+              key={order.id}
+              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+            >
+              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                {order.inv_id}
+              </td>
+              <td className="px-6 py-4 text-center">{order.user.username}</td>
+              <td className="px-6 py-4 text-center">{order.event.title}</td>
+              <td className="px-6 py-4 text-center">{order.total_ticket}</td>
+              <td className="px-6 py-4 text-center">
+                {formatDate(order.createdAt)}
+              </td>
+              <td className="px-6 py-4 text-center">
+                {formatDate(order.payment_date)}
+              </td>
+              <td
+                className={`px-6 py-4 uppercase text-center ${
+                  order.status === "confirmed"
+                    ? "text-[#5D9B76]"
+                    : order.status === "pending"
+                    ? "text-yellow-400"
+                    : "text-red-700"
+                }`}
+              >
+                {order.status}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
