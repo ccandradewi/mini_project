@@ -4,7 +4,11 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { imageSrc } from "@/utils/image.render";
-import { IoLocationOutline, IoCalendarOutline } from "react-icons/io5";
+import {
+  IoLocationOutline,
+  IoCalendarOutline,
+  IoTicketOutline,
+} from "react-icons/io5";
 import { FaCirclePlus, FaCircleMinus } from "react-icons/fa6";
 import { useAppSelector } from "@/app/hooks";
 import { TUser } from "@/models/user.model";
@@ -26,6 +30,7 @@ interface Event {
   start_promo: string;
   end_promo: string;
   type: string;
+  availability: number;
 }
 
 interface VoucherPoint {
@@ -183,6 +188,16 @@ function DetailCheckouts() {
       });
       return;
     }
+
+    if (!event || totalTicket > event?.availability) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please choose a quantity less than or equal to the available stock!",
+      });
+      return; // Prevent further execution of the function
+    }
+
     const data = {
       buyer_id: buyerId,
       event_id: event?.id,
@@ -278,6 +293,11 @@ function DetailCheckouts() {
                   </div>
                   <div className="flex flex-row items-center gap-2">
                     <IoLocationOutline /> {event?.venue}
+                  </div>
+                  <div className="flex flex-row items-center gap-2">
+                    <IoTicketOutline />{" "}
+                    <span className="font-bold"> {event?.availability} </span>
+                    remaining tickets
                   </div>
                 </div>
                 <div>
