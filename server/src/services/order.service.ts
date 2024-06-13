@@ -66,6 +66,9 @@ class OrderService {
   async getOrderByBuyerId(req: Request) {
     const data = await prisma.order.findMany({
       where: { buyer_id: req.user?.id },
+      orderBy: {
+        updatedAt: "desc",
+      },
       select: {
         id: true,
         buyer_id: true,

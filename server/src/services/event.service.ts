@@ -19,6 +19,8 @@ class EventService {
         promotor: true,
         promo: true,
         venue: true,
+        end_promo: true,
+        start_promo: true,
       },
     });
     return data;
