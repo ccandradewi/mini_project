@@ -539,6 +539,38 @@ class OrderService {
       where: { id: orderId },
     });
   }
+  async getTicket(req: Request) {
+    const { orderId } = req.params;
+    const order = await prisma.order.findMany({
+      where: { id: orderId },
+      select: {
+        id: true,
+        total_ticket: true,
+        total_price: true,
+        payment_method: true,
+        inv_id: true,
+        user: {
+          select: {
+            first_name: true,
+            last_name: true,
+            email: true,
+            phone_number: true,
+          },
+        },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            venue: true,
+            start_time: true,
+            banner: true,
+            location: true,
+          },
+        },
+      },
+    });
+    return order;
+  }
 }
 
 // TODO: update order, validate voucher/point, service fetch voucherpoint

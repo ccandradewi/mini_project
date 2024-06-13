@@ -78,13 +78,18 @@ function MyTicketCard() {
             <div
               key={index}
               className={`flex flex-col flex-wrap gap-10 justify-center ${
-                order.status === "pending" ? "cursor-pointer" : ""
+                order.status === "pending" || order.status === "confirmed"
+                  ? "cursor-pointer"
+                  : ""
               }`}
-              onClick={
-                order.status === "pending"
-                  ? () => router.push(`/invoice/${order.id}`)
-                  : undefined
-              }
+              onClick={() => {
+                if (order.status === "pending") {
+                  router.push(`/invoice/${order.id}`);
+                } else if (order.status === "confirmed") {
+                  router.push(`/member/eticket/${order.id}`);
+                }
+              }}
+              // onClick={() => router.push(`/invoice/${order.id}`)}
             >
               <div className="border w-full flex flex-row justify-between rounded-lg shadow-md overflow-hidden truncate cursor-pointer">
                 <div className="p-4 gap-2 flex flex-col">

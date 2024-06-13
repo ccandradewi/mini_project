@@ -42,6 +42,7 @@ class OrderRouter {
       "/event/:eventId/status/:status",
       orderController.getOrderByEventIdAndStatus
     );
+    this.router.get("/ticket/:orderId", orderController.getTicket);
     this.router.get("/vp/:buyerId", orderController.getVoucherPoint);
     this.router.delete("/:orderId", orderController.deleteOrder);
     this.router.post("/", verifyUser, verifyBuyer, orderController.createOrder);

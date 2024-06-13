@@ -43,13 +43,9 @@ const Register = () => {
       try {
         console.log("masuk");
         await axiosInstance().post("/users/v1", values);
-        router.push("/verification");
-        Swal.fire({
-          title: "Registration success!",
-          text: "Your account has been created.",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
+        router.push(`/verification?email=${values.email}`);
+        // alert(data.message);
+        //alert bisa custom pake shadcn atau sweetalert
       } catch (error) {
         console.log(error);
         if (error instanceof AxiosError) {

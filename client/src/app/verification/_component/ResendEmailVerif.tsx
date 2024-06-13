@@ -3,21 +3,34 @@
 import { useAppSelector } from "@/app/hooks";
 import { axiosInstance } from "@/lib/axios.config";
 import { TUser } from "@/models/user.model";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export default function ResendEmailVerif() {
+  const searchParams = useSearchParams();
   const [responseMessage, setResponseMessage] = useState("");
-  const [userEmail, setUserEmail] = useState("");
   const { email } = useAppSelector((state) => state.auth) as TUser;
+  let userEmail: string | undefined = email || undefined;
+  if (!userEmail) {
+    const emailParam: string | null = searchParams.get("email");
+    if (emailParam) {
+      userEmail = emailParam;
+    }
+  }
   const resendVerif = async () => {
     try {
       const response = await axiosInstance().post(
         "/users/resendVerificationEmail",
-        { email: email },
+        { email: userEmail },
         { headers: { "Content-Type": "application/json" } }
       );
       setResponseMessage(response.data.message);
-      setUserEmail(response.data.email);
+      Swal.fire({
+        title: "Success!",
+        text: "Email has been sent. Please check your box",
+        icon: "success",
+      });
     } catch (error) {
       console.log("Error caling API");
       setResponseMessage("API call failed");
