@@ -10,8 +10,6 @@ import {
   Title,
   Tooltip,
   Legend,
-  Tick,
-  Scale,
 } from "chart.js";
 
 ChartJS.register(
@@ -74,15 +72,9 @@ const EventChart: React.FC<EventChartProps> = ({ data }) => {
             const value = context.raw;
             const availability = data[context.dataIndex].availability;
 
-            console.log("Label:", label);
-            console.log("Availability:", availability);
-            console.log("Value:", value);
-
             if (label === "Remaining Tickets" && availability === 0) {
-              console.log("Sold Out condition met");
               return `Sold Out`;
             } else {
-              console.log("Normal condition met");
               return `${label}: ${getLabel(value)}`;
             }
           },
@@ -112,7 +104,9 @@ const EventChart: React.FC<EventChartProps> = ({ data }) => {
   };
 
   return (
-    <div style={{ width: "100%", height: "500px" }}>
+    <div className="">
+      {" "}
+      {/* Adjusted height here */}
       <Bar data={chartData} options={options} />
     </div>
   );
