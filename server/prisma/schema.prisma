@@ -121,7 +121,8 @@ model Event {
   start_promo DateTime?
   end_promo   DateTime?
 
-  Order Order[]
+  Order  Order[]
+  Review Review[]
 
   @@index([title])
   @@map("events")
@@ -168,6 +169,8 @@ model Review {
   user_id     String
   order_id    String
   order       Order  @relation(fields: [order_id], references: [id])
+  event_id    String
+  event       Event  @relation(fields: [event_id], references: [id])
   description String @db.LongText
   rating      Int
 

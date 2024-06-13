@@ -1,9 +1,6 @@
 import { Request } from "express";
 import { prisma } from "../libs/prisma";
-import { CategoryName, LocationName, Prisma, Promo } from "@prisma/client";
-import { TEvent } from "../model/event.model";
-import sharp from "sharp";
-
+import { TReview } from "../model/review.model";
 class DashboardService {
   async getSellerDashboardMetric(req: Request) {
     console.log("Start fetching data for user dashboard metrics");
@@ -103,57 +100,60 @@ class DashboardService {
       throw new Error("Internal server error");
     }
   }
+  async addReview(req: Request) {
+    const { event_id, description, rating } = req.body;
+    const findReviewId = await prisma.review.findMany({
+      where: {
+        event_id: event_id,
+        description: description,
+        rating: rating,
+      },
+    });
 
-  //   async createReview(req: Request) {
-  //     const userId = req.user?.id;
-  //     const { description, rating } = req.body;
-
-  //     if (!userId) {
-  //       console.error("User ID is missing");
-  //       throw new Error("User ID is missing");
-  //     }
-
-  //     try {
-  //       // Fetch all orders for the user
-  //       const orders = await prisma.order.findMany({
-  //         where: {
-  //           buyer_id: userId,
-  //         },
-  //         include: {
-  //           event: true,
-  //         },
-  //       });
-
-  //       if (orders.length === 0) {
-  //         throw new Error("No orders found for the user");
-  //       }
-
-  //       // Find the first order where the event has passed and a review does not exist
-  //       const now = new Date();
-  //     '  const orderToReview = orders.find(
-  // '        (order) => order.event.end_time < now && !order.Review.length
-  // '      );
-  // '
-  //       if (!orderToReview) {
-  //         throw new Error("No past events to review or review already exists");
-  //       }
-
-  //       // Create the review with the order ID as the review ID
-  //       const review = await prisma.review.create({
-  //         data: {
-  //           id: orderToReview.id, // Using order ID as review ID
-  //           user_id: userId,
-  //           order_id: orderToReview.id,
-  //           description,
-  //           rating,
-  //         },
-  //       });
-
-  //       return review;
-  //     } catch (error) {
-  //       console.error("Error creating review:", error);
-  //     }
-  //   }
+    if (findReviewId.length > 0) {
+      const updateReview = await prisma.review.update({
+        where: { id: findReviewId[0].id },
+        data: {
+          description: description,
+          rating: rating,
+        },
+      });
+      return updateReview;
+    } else {
+      return "Unable to add more review. You have added review for this event";
+    }
+  }
+  async getReviewByEventId(req: Request) {
+    const { eventId } = req.params;
+    const findReviewId = await prisma.review.findMany({
+      where: {
+        event_id: eventId,
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+    if (findReviewId) {
+      return findReviewId;
+    } else {
+      return "No one has bought the event so no review yet";
+    }
+  }
+  async getReviewByUserId(req: Request) {
+    const { userId } = req.params;
+    const findReviewId = await prisma.review.findMany({
+      where: { user_id: userId },
+    });
+    if (findReviewId) {
+      return findReviewId;
+    } else {
+      return "No one has bought the event so no review yet";
+    }
+  }
 }
 
 export default new DashboardService();
