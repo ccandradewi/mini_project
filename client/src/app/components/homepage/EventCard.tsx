@@ -80,60 +80,117 @@ const EventCard: React.FC<EventCardProps> = ({
   const eventsToDisplay =
     searchResults.length > 0 ? searchResults : filteredEvents;
 
+  const today = dayjs().startOf("day");
+  const upcomingEvents = eventsToDisplay.filter((event) =>
+    dayjs(event.end_time).isAfter(today)
+  );
+  const pastEvents = eventsToDisplay.filter((event) =>
+    dayjs(event.end_time).isBefore(today)
+  );
+
   return (
     <div className="flex flex-row flex-wrap gap-4">
       {loading && <div>Loading events...</div>}
       {error && <div className="text-red-500">{error}</div>}
-      {!loading && !error && eventsToDisplay.length > 0
-        ? eventsToDisplay.map((event) => (
-            <div
-              key={event.id}
-              className="border w-80 flex flex-col rounded-lg shadow-md overflow-hidden truncate cursor-pointer"
-              onClick={() => redirectToEvent(event.id)}
-            >
-              <div className="h-32 relative">
-                <img
-                  src={`${imageSrc}${event.id}`}
-                  alt=""
-                  className="object-cover w-full h-full"
-                />
-              </div>
-              <div className="p-3 gap-2 flex flex-col">
-                <div className="text-md font-bold">{event.title}</div>
-                <div className="text-md">
-                  {dayjs(event.start_time).format("DD MMMM YYYY")}
-                </div>
-                <div>{event.venue}</div>
-                <div className="font-bold">
-                  {event.discount_price &&
-                  event.end_promo &&
-                  new Date() <= new Date(event.end_promo) ? (
-                    <div>
-                      <span className="line-through mr-2">
-                        IDR {event.ticket_price.toLocaleString("en-ID")}
-                      </span>
-                      <span>
-                        IDR {event?.discount_price.toLocaleString("en-ID")}
-                      </span>
-                    </div>
-                  ) : event.ticket_price === 0 ? (
-                    "FREE"
-                  ) : (
-                    `IDR ${event.ticket_price.toLocaleString("en-ID")}`
-                  )}
-                </div>
-                <div className="border my-2" />
-                <div className="flex flex-row gap-2">
-                  <div>{event.promotor}</div>
-                </div>
-              </div>
+
+      {/* Display upcoming events */}
+      {upcomingEvents.map((event) => (
+        <div
+          key={event.id}
+          className="border w-80 flex flex-col rounded-lg shadow-md overflow-hidden truncate cursor-pointer"
+          onClick={() => redirectToEvent(event.id)}
+        >
+          <div className="h-32 relative">
+            <img
+              src={`${imageSrc}${event.id}`}
+              alt=""
+              className="object-cover w-full h-full"
+            />
+          </div>
+          <div className="p-3 gap-2 flex flex-col">
+            <div className="text-md font-bold">{event.title}</div>
+            <div className="text-md">
+              {dayjs(event.start_time).format("DD MMMM YYYY")}
             </div>
-          ))
-        : !loading && (
-            <div className="text-center text-gray-500">
-              No events found in {selectedCity}
+            <div>{event.venue}</div>
+            <div className="font-bold">
+              {event.promo && event.discount_price !== undefined ? (
+                <div>
+                  <span className="line-through mr-2">
+                    IDR {event.ticket_price.toLocaleString("en-ID")}
+                  </span>
+                  <span>
+                    IDR {event.discount_price.toLocaleString("en-ID")}
+                  </span>
+                </div>
+              ) : event.ticket_price === 0 ? (
+                "FREE"
+              ) : (
+                `IDR ${event.ticket_price.toLocaleString("en-ID")}`
+              )}
             </div>
-          )}
+            <div className="border my-2" />
+            <div className="flex flex-row gap-2">
+              <div>{event.promotor}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Display past events with disabled click and an indicator */}
+      {pastEvents.map((event) => (
+        <div
+          key={event.id}
+          className="border w-80 flex flex-col rounded-lg shadow-md cursor-pointer"
+          onClick={() => redirectToEvent(event.id)}
+          // Disabled click event by not adding onClick handler
+        >
+          <div className="h-32 relative">
+            <img
+              src={`${imageSrc}${event.id}`}
+              alt=""
+              className="object-cover w-full h-full"
+            />
+            {/* Past Event Indicator */}
+            <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-md text-sm">
+              Past Event
+            </div>
+          </div>
+          <div className="p-3 gap-2 flex flex-col">
+            <div className="text-md font-bold">{event.title}</div>
+            <div className="text-md">
+              {dayjs(event.start_time).format("DD MMMM YYYY")}
+            </div>
+            <div>{event.venue}</div>
+            <div className="font-bold">
+              {event.promo && event.discount_price !== undefined ? (
+                <div>
+                  <span className="line-through mr-2">
+                    IDR {event.ticket_price.toLocaleString("en-ID")}
+                  </span>
+                  <span>
+                    IDR {event.discount_price.toLocaleString("en-ID")}
+                  </span>
+                </div>
+              ) : event.ticket_price === 0 ? (
+                "FREE"
+              ) : (
+                `IDR ${event.ticket_price.toLocaleString("en-ID")}`
+              )}
+            </div>
+            <div className="border my-2" />
+            <div className="flex flex-row gap-2">
+              <div>{event.promotor}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {!loading && upcomingEvents.length === 0 && pastEvents.length === 0 && (
+        <div className="text-center text-gray-500">
+          No events found in {selectedCity}
+        </div>
+      )}
     </div>
   );
 };

@@ -50,7 +50,7 @@ function EventDetails() {
 
   return (
     <>
-      <div className="w-screen h-screen">
+      <div className=" w-screen">
         <div className="lg:px-32 py-6">
           {/* BREADCRUMBS */}
           <div className="text-sm breadcrumbs pt-6">
@@ -65,7 +65,7 @@ function EventDetails() {
           </div>
 
           {/* BANNER */}
-          <div className="flex flex-row">
+          <div className="flex flex-row pb-10">
             <div className="w-full h-80 px-4 relative">
               <img
                 src={`${imageSrc}${event?.id}`}

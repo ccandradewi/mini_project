@@ -336,6 +336,60 @@ class EventService {
       where: { id: eventId },
     });
   }
+  async addReview(req: Request) {
+    const { event_id, description, rating } = req.body;
+    const findReviewId = await prisma.review.findMany({
+      where: {
+        event_id: event_id,
+        rating: { equals: 0 },
+        description: { equals: "" },
+      },
+    });
+
+    if (findReviewId.length > 0) {
+      const updateReview = await prisma.review.update({
+        where: { id: findReviewId[0].id },
+        data: {
+          description: description,
+          rating: rating,
+        },
+      });
+      return updateReview;
+    } else {
+      return "Unable to add more review. You have added review for this event";
+    }
+  }
+  async getReviewByEventId(req: Request) {
+    const { eventId } = req.params;
+    const findReviewId = await prisma.review.findMany({
+      where: {
+        event_id: eventId,
+      },
+      include: {
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+    if (findReviewId) {
+      return findReviewId;
+    } else {
+      return "No one has bought the event so no review yet";
+    }
+  }
+  async getReviewByUserId(req: Request) {
+    const { userId } = req.params;
+    const findReviewId = await prisma.review.findMany({
+      where: { user_id: userId },
+    });
+    if (findReviewId) {
+      return findReviewId;
+    } else {
+      return "No one has bought the event so no review yet";
+    }
+  }
 }
 
 export default new EventService();

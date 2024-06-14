@@ -2,6 +2,7 @@ import { Router } from "express";
 import dashboardController from "../controllers/dashboard.controller";
 import { verifyUser } from "../middlewares/auth.middleware";
 import { verifySeller } from "../middlewares/role.middleware";
+import eventController from "../controllers/event.controller";
 
 class DashboardRouter {
   private router: Router;

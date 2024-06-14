@@ -523,6 +523,22 @@ class OrderService {
         updatedAt: new Date(),
       },
     });
+    // check if the posibility of this user to review this event already listed in review table
+    const isDataReviewExist = await prisma.review.findFirst({
+      where: { user_id: order.buyer_id, event_id: order.event_id },
+    });
+
+    if (!isDataReviewExist) {
+      await prisma.review.create({
+        data: {
+          event_id: order.event_id,
+          user_id: order.buyer_id,
+          order_id: orderId,
+          description: "",
+          rating: 0,
+        },
+      });
+    }
     return updatedOrder;
   }
   async deleteOrder(req: Request) {

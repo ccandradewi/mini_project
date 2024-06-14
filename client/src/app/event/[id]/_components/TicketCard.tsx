@@ -1,8 +1,10 @@
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoPricetagOutline } from "react-icons/io5";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import { axiosInstance } from "@/lib/axios.config";
+import EventReview from "./EventReview";
 
 interface TicketCardProps {
   title?: string;
@@ -13,7 +15,15 @@ interface TicketCardProps {
   type?: string;
   endTime?: string;
 }
-
+interface User {
+  username: string;
+}
+interface Review {
+  rating: number;
+  description: string;
+  createdAt: string;
+  user: User; // Assuming the user_id is part of the review
+}
 const TicketCard: React.FC<TicketCardProps> = ({
   title,
   price,
@@ -24,10 +34,31 @@ const TicketCard: React.FC<TicketCardProps> = ({
   endTime,
 }) => {
   const router = useRouter();
-
+  const [reviews, setReviews] = useState<Review[]>([]);
   const formatPrice = (price: number) => {
     return `Rp ${price.toLocaleString("id-ID")}`;
   };
+  useEffect(() => {
+    const fetchEventData = async () => {
+      try {
+        if (!id) return;
+
+        const orderResponse = await axiosInstance().get(
+          `/event/getReviewByEventId/${id}`
+        );
+        const { data } = orderResponse.data; // Adjust based on your API response structure
+        if (Array.isArray(data)) {
+          setReviews(data); // Ensure data is an array before setting it
+        } else {
+          console.error("Fetched data is not an array: ", data);
+        }
+      } catch (error) {
+        console.error("error fetching", error);
+      }
+    };
+
+    fetchEventData();
+  }, [id]);
 
   const handleBuyTickets = () => {
     if (endTime && new Date() > new Date(endTime)) {
@@ -41,6 +72,9 @@ const TicketCard: React.FC<TicketCardProps> = ({
         router.push(`/checkout/${id}`);
       }
     }
+  };
+  const censorUsername = (username: string) => {
+    return username.slice(0, -3) + "***";
   };
 
   return (
@@ -71,6 +105,21 @@ const TicketCard: React.FC<TicketCardProps> = ({
           Buy Ticket
         </button>
       </div>
+      {reviews && reviews.length > 0 && (
+        <div className="mt-4">
+          {reviews
+            .filter((item) => item.rating > 0)
+            .map((review, index) => (
+              <EventReview
+                key={index}
+                rating={review.rating}
+                username={censorUsername(review.user.username)}
+                reviewText={review.description}
+                reviewDate={dayjs(review.createdAt).format("DD MMMM YYYY")}
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 };

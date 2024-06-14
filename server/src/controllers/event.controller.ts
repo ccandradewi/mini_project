@@ -104,6 +104,36 @@ class EventController {
       next(error);
     }
   }
+  async addReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await eventService.addReview(req);
+      return res.send({
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getReviewByEventId(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await eventService.getReviewByEventId(req);
+      return res.send({
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getReviewByUserId(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await eventService.getReviewByUserId(req);
+      return res.send({
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new EventController();
