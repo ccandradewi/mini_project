@@ -1,10 +1,12 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ResendEmailVerif from "./_component/ResendEmailVerif";
 
 function VerifyPage() {
   return (
     <>
-      <ResendEmailVerif />;
+      <Suspense fallback={<div>Loading...</div>}>
+        <ResendEmailVerif />;
+      </Suspense>
     </>
   );
 }
