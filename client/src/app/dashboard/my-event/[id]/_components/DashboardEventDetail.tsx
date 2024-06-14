@@ -7,7 +7,7 @@ import { IoLocationOutline, IoCalendarOutline } from "react-icons/io5";
 import { FiEdit } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
 import { imageSrc } from "@/utils/image.render";
-
+import EventReview from "@/app/event/[id]/_components/EventReview";
 interface Event {
   id: string;
   banner: string;
@@ -24,14 +24,28 @@ interface Event {
   start_promo: string;
   end_promo: string;
 }
-
+interface User {
+  username: string;
+}
+interface Review {
+  rating: number;
+  description: string;
+  createdAt: string;
+  user: User; // Assuming the user_id is part of the review
+}
 function DashboardEventDetail() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
 
   const [event, setEvent] = useState<Event | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
 
+  const censorUsername = (name: string) => {
+    const length = name.length;
+    const visiblePart = name.slice(0, Math.max(0, length - 3));
+    return `${visiblePart}***`;
+  };
   useEffect(() => {
     const fetchEventData = async () => {
       try {
@@ -42,22 +56,36 @@ function DashboardEventDetail() {
         );
 
         const { data } = response.data;
-
         setEvent(data);
-        // setEvent(data);
         console.log(data);
-
-        // const eventData: Event = response.data;
-        // setEvent(eventData);
-        // console.log(eventData);
       } catch (error) {
         console.error("error fetching", error);
       }
     };
 
     fetchEventData();
-  }, []);
+  }, [id]);
+  useEffect(() => {
+    const fetchReviewData = async () => {
+      try {
+        if (!id) return;
 
+        const orderResponse = await axiosInstance().get(
+          `/event/getReviewByEventId/${id}`
+        );
+        const { data } = orderResponse.data; // Adjust based on your API response structure
+        if (Array.isArray(data)) {
+          setReviews(data); // Ensure data is an array before setting it
+        } else {
+          console.error("Fetched data is not an array: ", data);
+        }
+      } catch (error) {
+        console.error("error fetching", error);
+      }
+    };
+
+    fetchReviewData();
+  }, [id]);
   const handleDeleteEvent = async () => {
     if (confirm("Are you sure you want to delete this event?")) {
       try {
@@ -139,6 +167,23 @@ function DashboardEventDetail() {
               >
                 <MdDeleteOutline /> Delete event
               </button>
+              {reviews && reviews.length > 0 && (
+                <div className="mt-4">
+                  {reviews
+                    .filter((item) => item.rating > 0)
+                    .map((review, index) => (
+                      <EventReview
+                        key={index}
+                        rating={review.rating}
+                        username={censorUsername(review.user.username)}
+                        reviewText={review.description}
+                        reviewDate={dayjs(review.createdAt).format(
+                          "DD MMMM YYYY"
+                        )}
+                      />
+                    ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
