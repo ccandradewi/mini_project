@@ -51,7 +51,7 @@ class UserService {
 
     delete data.password;
 
-    const accessToken = createToken(data, "1h");
+    const accessToken = createToken(data, "1hr");
     const refreshToken = createToken({ id: data.id }, "1hr");
     return {
       accessToken,
