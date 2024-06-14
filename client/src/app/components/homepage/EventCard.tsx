@@ -114,7 +114,12 @@ const EventCard: React.FC<EventCardProps> = ({
             </div>
             <div>{event.venue}</div>
             <div className="font-bold">
-              {event.promo && event.discount_price !== undefined ? (
+              {event.promo &&
+              event.discount_price !== undefined &&
+              event.start_promo &&
+              new Date() > new Date(event.start_promo) &&
+              event.end_promo &&
+              new Date() <= new Date(event.end_promo) ? (
                 <div>
                   <span className="line-through mr-2">
                     IDR {event.ticket_price.toLocaleString("en-ID")}

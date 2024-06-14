@@ -110,6 +110,7 @@ function EventDetails() {
                 endPromo={event?.end_promo}
                 type={event?.type}
                 endTime={event?.end_time}
+                startPromo={event?.start_promo}
               />
             </div>
           </div>

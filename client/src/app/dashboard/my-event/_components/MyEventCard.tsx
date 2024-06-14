@@ -86,7 +86,12 @@ function MyEventCard() {
                       ) : (
                         `IDR ${formatPrice(event.ticket_price)}`
                       )
-                    ) : event.promo && event.discount_price !== undefined ? (
+                    ) : event.promo &&
+                      event.discount_price !== undefined &&
+                      event.start_promo &&
+                      event.end_promo &&
+                      new Date() > new Date(event.start_promo) &&
+                      new Date() <= new Date(event.end_promo) ? (
                       <div>
                         <span className="line-through mr-2">
                           IDR {formatPrice(event.ticket_price)}

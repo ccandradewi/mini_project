@@ -11,6 +11,7 @@ interface TicketCardProps {
   price?: number;
   discountPrice?: number;
   id?: string;
+  startPromo?: string;
   endPromo?: string;
   type?: string;
   endTime?: string;
@@ -29,6 +30,7 @@ const TicketCard: React.FC<TicketCardProps> = ({
   price,
   discountPrice,
   id,
+  startPromo,
   endPromo,
   type,
   endTime,
@@ -84,7 +86,11 @@ const TicketCard: React.FC<TicketCardProps> = ({
         <IoPricetagOutline className="mr-1" />
         {type === "FREE" ? (
           <span>FREE</span>
-        ) : discountPrice && endPromo && new Date() <= new Date(endPromo) ? (
+        ) : discountPrice &&
+          endPromo &&
+          startPromo &&
+          new Date() <= new Date(endPromo) &&
+          new Date() > new Date(startPromo) ? (
           <>
             <span className="line-through mr-2">
               {price !== undefined ? formatPrice(price) : "N/A"}
