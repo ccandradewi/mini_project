@@ -433,7 +433,7 @@ function EditEventForm() {
                 Ticket stock
               </label>
               <input
-                type="number"
+                type="text"
                 name="availability"
                 placeholder="Ticket stock*"
                 className="input input-bordered w-full max-w-xs"
@@ -453,7 +453,7 @@ function EditEventForm() {
                 Price
               </label>
               <input
-                type="number"
+                type="text"
                 name="ticket_price"
                 placeholder="Ticket price"
                 className="input input-bordered w-full max-w-xs"

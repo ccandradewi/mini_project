@@ -101,11 +101,15 @@ const TicketCard: React.FC<TicketCardProps> = ({
           <span>{price !== undefined ? formatPrice(price) : "N/A"}</span>
         )}
       </div>
-      {discountPrice && endPromo && new Date() <= new Date(endPromo) && (
-        <div className="text-sm text-gray-500 mb-2">
-          Discount only until {dayjs(endPromo).format("DD MMMM YYYY")}
-        </div>
-      )}
+      {discountPrice &&
+        endPromo &&
+        new Date() <= new Date(endPromo) &&
+        startPromo &&
+        new Date() > new Date(startPromo) && (
+          <div className="text-sm text-gray-500 mb-2">
+            Discount only until {dayjs(endPromo).format("DD MMMM YYYY")}
+          </div>
+        )}
       <div className="flex flex-row justify-between">
         <button className="btn btn-dark" onClick={handleBuyTickets}>
           Buy Ticket
